@@ -10,7 +10,7 @@ import (
 func TestParseString(t *testing.T) {
 	assert := assert.New(t)
 	bs := MakeBaseClasses(nil)
-	b, err := os.ReadFile("test.txt")
+	b, err := os.ReadFile("tests/basictests.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
