@@ -47,6 +47,7 @@ func MakeBaseClasses(config *Config) map[string]OrderedCSS {
 		// Flexbox & Grid
 		flexBasis.produceMap(config),
 		flexDirection.produceMap(config),
+		flexWrap.produceMap(config),
 		grow.produceMap(config),
 		// Backgrounds
 		backgroundColor.produceMap(config),
@@ -177,6 +178,17 @@ func (a KeywordBaseClass) produceMap(config *Config) map[string]OrderedCSS {
 		}
 	}
 	return m
+}
+
+var flexWrap = KeywordBaseClass{
+	name:     "flex",
+	property: "flex-wrap",
+	values: map[string]string{
+		"wrap":         "wrap",
+		"wrap-reverse": "wrap-reverse",
+		"nowrap":       "nowrap",
+	},
+	order: 0,
 }
 
 var flexDirection = KeywordBaseClass{

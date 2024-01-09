@@ -37,3 +37,8 @@ active:flex-row
 .active\:flex-row:active {
   flex-direction: row;
 }
+
+visited:target:flex-wrap
+.visited\:target\:flex-wrap:target:visited {
+  flex-wrap: wrap;
+}

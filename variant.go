@@ -46,6 +46,8 @@ var pseudoClassVariants = []PseudoClassVariant{
 	{"focus-within"},
 	{"focus-visible"},
 	{"active"},
+	{"visited"},
+	{"target"},
 }
 
 type PseudoElementVariant struct {
