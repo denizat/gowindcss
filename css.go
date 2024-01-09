@@ -75,7 +75,9 @@ func (c CSS) String() string {
 	if len(c.PseudoElements) >= 1 {
 		pe = "::" + strings.Join(c.PseudoElements, "::")
 	}
-	selector := "." + strings.Replace(c.Selector, ":", "\\:", -1)
+	selector := strings.Replace(c.Selector, "[", "\\[", -1)
+	selector = strings.Replace(selector, "]", "\\]", -1)
+	selector = "." + strings.Replace(selector, ":", "\\:", -1)
 	cc := ""
 	if c.ChildCombinator != "" {
 		cc = " " + c.ChildCombinator

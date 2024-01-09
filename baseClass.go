@@ -46,6 +46,7 @@ func MakeBaseClasses(config *Config) map[string]OrderedCSS {
 		isolation.produceMap(config),
 		// Flexbox & Grid
 		flexBasis.produceMap(config),
+		grow.produceMap(config),
 		// Backgrounds
 		backgroundColor.produceMap(config),
 		// Typography
@@ -58,6 +59,7 @@ var baseClassesArbitrary = map[string]ArbitraryValue{
 	aspectRatio.baseForArbitraryValue():     aspectRatio,
 	columns.baseForArbitraryValue():         columns,
 	flexBasis.baseForArbitraryValue():       flexBasis,
+	grow.baseForArbitraryValue():            grow,
 	backgroundColor.baseForArbitraryValue(): backgroundColor,
 	textColor.baseForArbitraryValue():       textColor,
 }
@@ -87,7 +89,10 @@ func (a ArbitraryValueKeywordClass) arbitraryValue(v string) OrderedCSS {
 func (a ArbitraryValueKeywordClass) produceMap(config *Config) map[string]OrderedCSS {
 	m := map[string]OrderedCSS{}
 	for k, v := range a.defaults {
-		n := a.name + "-" + k
+		n := a.name
+		if k != "" {
+			n += "-" + k
+		}
 		m[n] = OrderedCSS{
 			css: CSS{
 				Declarations: []CSSDeclaration{{a.property, v}},
@@ -100,6 +105,16 @@ func (a ArbitraryValueKeywordClass) produceMap(config *Config) map[string]Ordere
 
 func (a ArbitraryValueKeywordClass) baseForArbitraryValue() string {
 	return a.name
+}
+
+var grow = ArbitraryValueKeywordClass{
+	name:     "grow",
+	property: "flex-grow",
+	defaults: map[string]string{
+		"":  "1",
+		"0": "0",
+	},
+	order: 0,
 }
 
 var aspectRatio = ArbitraryValueKeywordClass{

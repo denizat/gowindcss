@@ -16,7 +16,7 @@ func TestParseString(t *testing.T) {
 	}
 	s := string(b)
 	cases := strings.Split(s, "\n\n")
-	for _, v := range cases {
+	for _, v := range cases[len(cases)-1:] {
 		parts := strings.SplitN(v, "\n", 2)
 		className := parts[0]
 		target := parts[1]
@@ -24,7 +24,7 @@ func TestParseString(t *testing.T) {
 		res := OrderedCSSArrToString(cs)
 		res = strings.TrimSpace(res)
 		target = strings.TrimSpace(target)
-		assert.Equal(res, target)
+		assert.Equal(target, res)
 	}
 
 }

@@ -22,3 +22,13 @@ focus:text-balance
 .focus\:text-balance:focus {
   text-wrap: balance;
 }
+
+focus-within:grow-0
+.focus-within\:grow-0:focus-within {
+  flex-grow: 0;
+}
+
+focus-visible:grow-[2]
+.focus-visible\:grow-\[2\]:focus-visible {
+  flex-grow: 2;
+}

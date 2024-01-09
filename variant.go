@@ -43,6 +43,8 @@ func (p PseudoClassVariant) base() string {
 var pseudoClassVariants = []PseudoClassVariant{
 	{"hover"},
 	{"focus"},
+	{"focus-within"},
+	{"focus-visible"},
 }
 
 type PseudoElementVariant struct {
