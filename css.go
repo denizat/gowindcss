@@ -167,11 +167,24 @@ func isLowerAlnum(b byte) bool {
 // TODO: add support for parsing arbitrary variants and values
 func createCSSFromClassString(s string) []OrderedCSS {
 	groups := strings.Split(s, ":")
-	css, ok := baseClasses[groups[len(groups)-1]]
-	css.css.Selector = s
+	base := groups[len(groups)-1]
+	css, ok := baseClasses[base]
 	if !ok {
-		return nil
+		parts := strings.Split(base, "-[")
+		if len(parts) < 2 || parts[1] == "" {
+			return nil
+		}
+		key := strings.Join(parts[:len(parts)-1], "") // this join should be unnecessary
+		arbitraryValue := parts[len(parts)-1]
+		arbitraryValue = arbitraryValue[:len(arbitraryValue)-1]
+		baseClass, ok := baseClassesArbitrary[key]
+		if !ok {
+			return nil
+		}
+		css = baseClass.arbitraryValue(arbitraryValue)
 	}
+
+	css.css.Selector = s
 	csses := []OrderedCSS{css}
 	for i := len(groups) - 2; i >= 0; i-- {
 		l := len(csses)
