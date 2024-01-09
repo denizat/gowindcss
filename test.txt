@@ -1,0 +1,19 @@
+sm:md:lg:md:sm:bg-red-100
+@media (min-width: 640px) {
+  @media (min-width: 768px) {
+    @media (min-width: 1024px) {
+      @media (min-width: 768px) {
+        @media (min-width: 640px) {
+          .sm\:md\:lg\:md\:sm\:bg-red-100 {
+            background-color: #fee2e2;
+          }
+        }
+      }
+    }
+  }
+}
+
+hover:aspect-video
+.hover\:aspect-video:hover {
+  aspect-ratio: 16 / 9;
+}

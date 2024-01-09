@@ -83,20 +83,28 @@ func (c CSS) String() string {
 	b.WriteString(selector + cc + pc + pe + " {\n")
 	for _, declaration := range c.Declarations {
 
-		b.WriteString("\t" + declaration.Property + ": " + declaration.Value + ";\n")
+		b.WriteString(indent + declaration.Property + ": " + declaration.Value + ";\n")
 	}
 	b.WriteString("}\n")
 	return wrapInMedias(c.MediaQueries, b.String())
 }
 
+const indent = "  "
+
 func wrapInMedias(ms []string, s string) string {
 	out := ""
-	for _, m := range ms {
-		out += "@media (" + m + ") {\n"
+	for i, m := range ms {
+		out += strings.Repeat(indent, i) + "@media (" + m + ") {\n"
 	}
-	out += s
-	for range ms {
-		out += "}\n"
+	lines := strings.Split(s, "\n")
+	for i := range lines[:len(lines)-1] {
+		out += strings.Repeat(indent, len(ms)) + lines[i]
+		if i < len(lines)-1 {
+			out += "\n"
+		}
+	}
+	for i := range ms {
+		out += strings.Repeat(indent, len(ms)-i-1) + "}\n"
 	}
 	return out
 }

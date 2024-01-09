@@ -1,19 +1,30 @@
 package main
 
 import (
+	"github.com/stretchr/testify/assert"
+	"os"
+	"strings"
 	"testing"
 )
 
 func TestParseString(t *testing.T) {
-	s := "aspect-video"
+	assert := assert.New(t)
 	bs := MakeBaseClasses(nil)
-	csses := ParseString(s, variants, bs)
-	if len(csses) != 1 {
-		t.Error("len(csses) != 1")
+	b, err := os.ReadFile("test.txt")
+	if err != nil {
+		t.Fatal(err)
 	}
-	sel := csses[0].css.Selector
-	if sel != s {
-		t.Errorf("sel:%s != %s", sel, s)
+	s := string(b)
+	cases := strings.Split(s, "\n\n")
+	for _, v := range cases {
+		parts := strings.SplitN(v, "\n", 2)
+		className := parts[0]
+		target := parts[1]
+		cs := ParseString(className, variants, bs)
+		res := OrderedCSSArrToString(cs)
+		res = strings.TrimSpace(res)
+		target = strings.TrimSpace(target)
+		assert.Equal(res, target)
 	}
 
 }
