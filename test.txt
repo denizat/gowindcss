@@ -32,3 +32,8 @@ focus-visible:grow-[2]
 .focus-visible\:grow-\[2\]:focus-visible {
   flex-grow: 2;
 }
+
+active:flex-row
+.active\:flex-row:active {
+  flex-direction: row;
+}

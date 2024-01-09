@@ -46,6 +46,7 @@ func MakeBaseClasses(config *Config) map[string]OrderedCSS {
 		isolation.produceMap(config),
 		// Flexbox & Grid
 		flexBasis.produceMap(config),
+		flexDirection.produceMap(config),
 		grow.produceMap(config),
 		// Backgrounds
 		backgroundColor.produceMap(config),
@@ -176,6 +177,18 @@ func (a KeywordBaseClass) produceMap(config *Config) map[string]OrderedCSS {
 		}
 	}
 	return m
+}
+
+var flexDirection = KeywordBaseClass{
+	name:     "flex",
+	property: "flex-direction",
+	values: map[string]string{
+		"row":         "row",
+		"row-reverse": "row-reverse",
+		"col":         "col",
+		"col-reverse": "col-reverse",
+	},
+	order: 0,
 }
 
 var breakAfter = KeywordBaseClass{
