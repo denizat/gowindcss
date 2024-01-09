@@ -6,11 +6,16 @@ type Variant interface {
 	base() string
 }
 
-var variants = concatMaps(
-	variantMapFromArrs(pseudoClassVariants),
-	variantMapFromArrs(pseudoElementVariants),
-	variantMapFromArrs([]DoublePsuedoElementVariant{markerVariant}),
-)
+func MakeVariants(c *Config) map[string]Variant {
+	return concatMaps(
+		variantMapFromArrs(pseudoClassVariants),
+		variantMapFromArrs(pseudoElementVariants),
+		variantMapFromArrs([]DoublePsuedoElementVariant{markerVariant}),
+		variantMapFromArrs(genBreakpointsVariant(c)),
+	)
+}
+
+var variants = MakeVariants(nil)
 
 func variantMapFromArrs[T Variant](arr []T) map[string]Variant {
 	m := map[string]Variant{}
@@ -97,14 +102,6 @@ func (m MediaVariant) base() string {
 	return m.name
 }
 
-var breakpoints = []MediaVariant{
-	{"sm", "min-width: 640px"},
-	{"md", "min-width: 768px"},
-	{"lg", "min-width: 1024px"},
-	{"xl", "min-width: 1280px"},
-	{"2xl", "min-width: 1536px"},
-}
-
 // preferences and other things
 var preferences = []MediaVariant{
 	{"dark", "prefers-color-scheme: dark"},
@@ -147,4 +144,28 @@ func (s customSupportsVariant) base() string {
 type ariaStatesVariant struct {
 	name  string
 	value string
+}
+
+type BreakpointsVariant struct {
+	name  string
+	value string
+}
+
+func genBreakpointsVariant(_ *Config) []Variant {
+	arr := []Variant{}
+	for k, v := range defaultBreakpoints {
+		arr = append(arr, BreakpointsVariant{name: k, value: v})
+	}
+	return arr
+}
+
+func (b BreakpointsVariant) convert(arbitraryValue *string, c CSS) []CSS {
+	if arbitraryValue != nil {
+		return nil
+	}
+	c.MediaQueries = append(c.MediaQueries, "min-width: "+b.value)
+	return []CSS{c}
+}
+func (b BreakpointsVariant) base() string {
+	return b.name
 }

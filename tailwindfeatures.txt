@@ -1,0 +1,15 @@
+ordering of classes
+arbitrary values for base classes
+arbitrary variants
+some variants produce more than one css thing
+some variants add extra selectors (not sure how to handle this)
+customzing from a json file:
+    They will move to customizing from a css file but
+    will keep backwards compatability with the json file.
+    I think I will target the json file then make an adaptor that
+    takes their css file and turns it into JSON for my code to understand.
+
+
+tailwind features they wish they did not have:
+    @apply (use theme() and spacing() instead)
+

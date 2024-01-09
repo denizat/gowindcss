@@ -116,11 +116,11 @@ func OrderedCSSArrToString(c []OrderedCSS) string {
 	return b.String()
 }
 
-func ParseString(s string) []OrderedCSS {
+func ParseString(s string, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
 	r := strings.NewReader(s)
 	csses := []OrderedCSS{}
 	for {
-		res := ProduceNextCSS(r)
+		res := ProduceNextCSS(r, vs, bs)
 		if res == nil {
 			return csses
 		}
@@ -128,13 +128,13 @@ func ParseString(s string) []OrderedCSS {
 	}
 }
 
-func ProduceNextCSS(r io.ByteReader) []OrderedCSS {
+func ProduceNextCSS(r io.ByteReader, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
 	for {
 		rf := ReadNextClass(r)
 		if rf == "" {
 			return nil
 		}
-		res := createCSSFromClassString(rf)
+		res := createCSSFromClassString(rf, vs, bs)
 		if res != nil {
 			return res
 		}
@@ -165,10 +165,10 @@ func isLowerAlnum(b byte) bool {
 }
 
 // TODO: add support for parsing arbitrary variants and values
-func createCSSFromClassString(s string) []OrderedCSS {
+func createCSSFromClassString(s string, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
 	groups := strings.Split(s, ":")
 	base := groups[len(groups)-1]
-	css, ok := baseClasses[base]
+	css, ok := bs[base]
 	if !ok {
 		parts := strings.Split(base, "-[")
 		if len(parts) < 2 || parts[1] == "" {
@@ -176,6 +176,9 @@ func createCSSFromClassString(s string) []OrderedCSS {
 		}
 		key := strings.Join(parts[:len(parts)-1], "") // this join should be unnecessary
 		arbitraryValue := parts[len(parts)-1]
+		if len(arbitraryValue) == 0 {
+			return nil
+		}
 		arbitraryValue = arbitraryValue[:len(arbitraryValue)-1]
 		baseClass, ok := baseClassesArbitrary[key]
 		if !ok {
@@ -191,7 +194,7 @@ func createCSSFromClassString(s string) []OrderedCSS {
 		for j := 0; j < l; j++ {
 			group := groups[i]
 			css := csses[j]
-			variant := variants[group]
+			variant := vs[group]
 			if variant == nil {
 				return nil
 			}
