@@ -34,7 +34,7 @@ func main() {
 
 	var bs map[string]OrderedCSS
 	if configFileName != "" {
-		bs = HandleConfigFile(configFileName)
+		bs = HandleConfigFile(&configFileName)
 	} else {
 		bs = MakeBaseClasses(nil)
 	}
@@ -56,8 +56,11 @@ func main() {
 	}
 }
 
-func HandleConfigFile(name string) map[string]OrderedCSS {
-	bs, err := os.ReadFile(name)
+func HandleConfigFile(fileName *string) map[string]OrderedCSS {
+	if fileName == nil {
+		return MakeBaseClasses(nil)
+	}
+	bs, err := os.ReadFile(*fileName)
 	if err != nil {
 		panic(err)
 	}

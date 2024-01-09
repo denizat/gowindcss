@@ -1,0 +1,37 @@
+{
+  "theme": {
+    "supports": {
+      "grid": "display: grid"
+    },
+    "colors": {
+      "celadon": "#ACE1AF"
+    },
+    "spacing": {
+      "ms": "1px"
+    },
+    "screens": {
+      "gameboy": "100px"
+    },
+    "fontFamily": {
+      "comic": [
+        "comic sans"
+      ]
+    },
+    "extend": {
+      "colors": {
+        "vermilion": "#E34234"
+      },
+      "spacing": {
+        "mes": "2px"
+      },
+      "screens": {
+        "casio": "200px"
+      },
+      "fontFamily": {
+        "monoid": [
+          "comic code"
+        ]
+      }
+    }
+  }
+}

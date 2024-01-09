@@ -13,3 +13,8 @@ customizing from a json file:
 tailwind features they wish they did not have:
     @apply (use theme() and spacing() instead)
 
+
+my features:
+- dump base classes for ide
+- built in formatter for html, no need for prettier
+<\w+(?:\s*[\w="]*\s*)class="([\w|\s]+)"(?:\s*[\w="]*\s*)*> with gm

@@ -3,18 +3,21 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 )
 
-func TestParseString(t *testing.T) {
+var commentLineRegex = regexp.MustCompile("#.*\n")
+
+func Helper(fileName string, t *testing.T, bs map[string]OrderedCSS) {
 	assert := assert.New(t)
-	bs := MakeBaseClasses(nil)
-	b, err := os.ReadFile("tests/basictests.txt")
+	b, err := os.ReadFile(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
 	s := string(b)
+	s = commentLineRegex.ReplaceAllLiteralString(s, "")
 	cases := strings.Split(s, "\n\n")
 	for _, v := range cases[len(cases)-1:] {
 		parts := strings.SplitN(v, "\n", 2)
@@ -26,7 +29,14 @@ func TestParseString(t *testing.T) {
 		target = strings.TrimSpace(target)
 		assert.Equal(target, res)
 	}
+}
 
+func TestParseString(t *testing.T) {
+	bs := HandleConfigFile(nil)
+	Helper("tests/defaultstests.txt", t, bs)
+	//fileName := "tests/config.json"
+	//bs = HandleConfigFile(&fileName)
+	//Helper("tests/configtests.txt", t, bs)
 }
 
 func FuzzParseString(f *testing.F) {
