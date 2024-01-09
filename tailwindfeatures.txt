@@ -2,7 +2,7 @@ ordering of classes
 arbitrary values for base classes
 arbitrary variants
 some variants produce more than one css thing
-some variants add extra selectors (not sure how to handle this)
+some variants add extra selectors (group and peer) (will have to do some heavy refactoring to handle this)
 customizing from a json file:
     They will move to customizing from a css file but
     will keep backwards compatability with the json file.

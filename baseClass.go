@@ -50,6 +50,7 @@ func MakeBaseClasses(config *Config) map[string]OrderedCSS {
 		backgroundColor.produceMap(config),
 		// Typography
 		textColor.produceMap(config),
+		textWrap.produceMap(config),
 	)
 }
 
@@ -244,6 +245,19 @@ var clear = KeywordBaseClass{
 		"right": "right",
 		"both":  "both",
 		"none":  "none",
+	},
+	order: 0,
+}
+
+var textWrap = KeywordBaseClass{
+	// TODO: check for duplicates
+	name:     "text",
+	property: "text-wrap",
+	values: map[string]string{
+		"wrap":    "wrap",
+		"nowrap":  "nowrap",
+		"balance": "balance",
+		"pretty":  "pretty",
 	},
 	order: 0,
 }
