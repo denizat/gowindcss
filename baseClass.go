@@ -71,6 +71,10 @@ const (
 	_ = iota * 100
 
 	aspectRatioOrder
+	columnsOrder
+	breakBeforeOrder
+	breakInsideOrder
+	breakAfterOrder
 	textWrapOrder
 
 	growOrder
@@ -159,7 +163,7 @@ var columns = ArbitraryValueKeywordClass{
 		"lg":   "32rem",
 		"xl":   "36rem", // tailwind does more, do later
 	},
-	order: 0,
+	order: columnsOrder,
 }
 
 type KeywordBaseClass struct {
@@ -220,7 +224,7 @@ var breakAfter = KeywordBaseClass{
 		"right":      "right",
 		"column":     "column",
 	},
-	order: 0,
+	order: breakAfterOrder,
 }
 var breakBefore = KeywordBaseClass{
 	name:     "break-before",
@@ -235,7 +239,7 @@ var breakBefore = KeywordBaseClass{
 		"right":      "right",
 		"column":     "column",
 	},
-	order: 0,
+	order: breakBeforeOrder,
 }
 var breakInside = KeywordBaseClass{
 	name:     "break-inside",
@@ -246,7 +250,7 @@ var breakInside = KeywordBaseClass{
 		"avoid-page":   "avoid-page",
 		"avoid-column": "avoid-column",
 	},
-	order: 0,
+	order: breakInsideOrder,
 }
 var boxDecoration = KeywordBaseClass{
 	name:     "box-decoration",

@@ -1,6 +1,3 @@
-# use the tidy on play.tailwindcss.com to see how they order things
-# from
-# to
 <div class="text-balance aspect-video"></div>
 <div class="aspect-video text-balance"></div>
 
@@ -9,3 +6,16 @@
 
 <div class="grow aspect-video"></div>
 <div class="aspect-video grow"></div>
+
+<div class="columns-1 aspect-square"></div>
+<div class="aspect-square columns-1"></div>
+
+<div class="break-after-auto columns-1"></div>
+<div class="columns-1 break-after-auto"></div>
+
+<div class="break-after-auto break-before-auto"></div>
+<div class="break-before-auto break-after-auto"></div>
+
+<div class="break-after-auto break-inside-auto"></div>
+<div class="break-inside-auto break-after-auto"></div>
+

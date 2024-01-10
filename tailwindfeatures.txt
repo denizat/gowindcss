@@ -17,4 +17,5 @@ tailwind features they wish they did not have:
 my features:
 - dump base classes for ide
 - built in formatter for html, no need for prettier
-<\w+(?:\s*[\w="]*\s*)class="([\w|\s]+)"(?:\s*[\w="]*\s*)*> with gm
+- offline documentation
+- offline repl (play.tailwind.css)
