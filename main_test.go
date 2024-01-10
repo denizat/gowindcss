@@ -39,9 +39,8 @@ func Helper(fileName string, t *testing.T, bs map[string]OrderedCSS) {
 		t.Fatal(err)
 	}
 	s := string(b)
-	s = commentLineRegex.ReplaceAllLiteralString(s, "")
 	cases := strings.Split(s, "\n\n")
-	for _, v := range cases[len(cases)-1:] {
+	for _, v := range cases {
 		parts := strings.SplitN(v, "\n", 2)
 		className := parts[0]
 		target := parts[1]
@@ -54,6 +53,7 @@ func Helper(fileName string, t *testing.T, bs map[string]OrderedCSS) {
 }
 
 func TestParseString(t *testing.T) {
+	//ParseString("focus-visible:grow-[0]", variants, HandleConfigFile(nil))
 	bs := HandleConfigFile(nil)
 	Helper("tests/defaultstests.txt", t, bs)
 	//fileName := "tests/config.json"

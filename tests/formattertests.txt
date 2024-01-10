@@ -19,3 +19,5 @@
 <div class="break-after-auto break-inside-auto"></div>
 <div class="break-inside-auto break-after-auto"></div>
 
+# <div class="hover:aspect-square aspect-video"></div>
+# <div class="aspect-video hover:aspect-square"></div>
