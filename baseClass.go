@@ -68,10 +68,14 @@ var baseClassesArbitrary = map[string]ArbitraryValue{
 
 // TODO: reorder this to fit what tailwind does
 const (
-	aspectRatioOrder = 100 * iota
-	columnsOrder
+	_ = iota * 100
+
+	aspectRatioOrder
+	textWrapOrder
+
+	growOrder
+	flexDirectionOrder
 )
-const _ = (iota+4)*columnsOrder + 4
 
 type ArbitraryValueKeywordClass struct {
 	name     string
@@ -116,7 +120,7 @@ var grow = ArbitraryValueKeywordClass{
 		"":  "1",
 		"0": "0",
 	},
-	order: 0,
+	order: growOrder,
 }
 
 var aspectRatio = ArbitraryValueKeywordClass{
@@ -155,7 +159,7 @@ var columns = ArbitraryValueKeywordClass{
 		"lg":   "32rem",
 		"xl":   "36rem", // tailwind does more, do later
 	},
-	order: columnsOrder,
+	order: 0,
 }
 
 type KeywordBaseClass struct {
@@ -200,7 +204,7 @@ var flexDirection = KeywordBaseClass{
 		"col":         "col",
 		"col-reverse": "col-reverse",
 	},
-	order: 0,
+	order: flexDirectionOrder,
 }
 
 var breakAfter = KeywordBaseClass{
@@ -299,7 +303,7 @@ var textWrap = KeywordBaseClass{
 		"balance": "balance",
 		"pretty":  "pretty",
 	},
-	order: 0,
+	order: textWrapOrder,
 }
 
 // TODO: replace all instances of order: 0

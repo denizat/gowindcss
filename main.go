@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"maps"
 	"os"
+	"slices"
 	"sort"
+	"strings"
 )
 
 var cache map[string]OrderedCSS
@@ -79,4 +82,62 @@ func HandleConfigFile(fileName *string) map[string]OrderedCSS {
 		maps.Copy(defaultColors, config.Theme.Extend.Screens)
 	}
 	return MakeBaseClasses(&config)
+}
+
+func Format(r io.ByteReader, w io.ByteWriter, vs map[string]Variant, bs map[string]OrderedCSS) {
+	for {
+		streamUntilMatch(r, w, "class=\"")
+		s, err := collectUntil(r, '"')
+		if err != nil {
+			break
+		}
+		s = realFormatGiveBetterName(s, vs, bs) + "\""
+		for i := range s {
+			w.WriteByte(s[i])
+		}
+	}
+}
+
+func collectUntil(r io.ByteReader, c byte) (string, error) {
+	var sb strings.Builder
+	for {
+		b, err := r.ReadByte()
+		if err != nil {
+			return "", err
+		}
+		if b == c {
+			return sb.String(), nil
+		}
+		sb.WriteByte(b)
+	}
+}
+
+func streamUntilMatch(r io.ByteReader, w io.ByteWriter, s string) {
+	i := 0
+	for {
+		b, err := r.ReadByte()
+		if err != nil {
+			return
+		}
+		// TODO: handle this error better
+		if w.WriteByte(b) != nil {
+			return
+		}
+		if b == s[i] {
+			i++
+			if i == len(s) {
+				return
+			}
+		} else if i > 0 {
+			i = 0
+		}
+	}
+}
+
+func realFormatGiveBetterName(s string, vs map[string]Variant, bs map[string]OrderedCSS) string {
+	classNames := strings.Split(s, " ")
+	slices.SortFunc(classNames, func(a, b string) int {
+		return OrderedCSSLess(a, b, vs, bs)
+	})
+	return strings.Join(classNames, " ")
 }

@@ -10,6 +10,28 @@ import (
 
 var commentLineRegex = regexp.MustCompile("#.*\n")
 
+type testCase struct {
+	from string
+	to   string
+}
+
+func parseTestFile(fileName string) ([]testCase, error) {
+	b, err := os.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+	s := string(b)
+	s = commentLineRegex.ReplaceAllLiteralString(s, "")
+	s = strings.TrimSpace(s)
+	casesStrings := strings.Split(s, "\n\n")
+	cases := []testCase{}
+	for _, casesString := range casesStrings {
+		parts := strings.SplitN(casesString, "\n", 2)
+		cases = append(cases, testCase{from: parts[0], to: parts[1]})
+	}
+	return cases, nil
+}
+
 func Helper(fileName string, t *testing.T, bs map[string]OrderedCSS) {
 	assert := assert.New(t)
 	b, err := os.ReadFile(fileName)
@@ -37,6 +59,21 @@ func TestParseString(t *testing.T) {
 	//fileName := "tests/config.json"
 	//bs = HandleConfigFile(&fileName)
 	//Helper("tests/configtests.txt", t, bs)
+}
+
+func TestFormat(t *testing.T) {
+	assert := assert.New(t)
+	cases, err := parseTestFile("tests/formattertests.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, acase := range cases {
+		r := strings.NewReader(acase.from)
+		var sb strings.Builder
+
+		Format(r, &sb, variants, MakeBaseClasses(nil))
+		assert.Equal(acase.to, sb.String())
+	}
 }
 
 func FuzzParseString(f *testing.F) {

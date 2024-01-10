@@ -1,0 +1,11 @@
+# use the tidy on play.tailwindcss.com to see how they order things
+# from
+# to
+<div class="text-balance aspect-video"></div>
+<div class="aspect-video text-balance"></div>
+
+<div class="flex-row grow"></div>
+<div class="grow flex-row"></div>
+
+<div class="grow aspect-video"></div>
+<div class="aspect-video grow"></div>

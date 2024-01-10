@@ -57,6 +57,17 @@ type OrderedCSS struct {
 	order int
 }
 
+func OrderedCSSLess(a string, b string, vs map[string]Variant, bs map[string]OrderedCSS) int {
+	acss := ParseString(a, vs, bs)[0]
+	bcss := ParseString(b, vs, bs)[0]
+	if acss.order < bcss.order {
+		return -1
+	} else if acss.order > bcss.order {
+		return 1
+	}
+	return 0
+}
+
 func Comparator(a OrderedCSS, b OrderedCSS) int {
 	// first order by variant lexicographically
 	// if equal then order by order field
