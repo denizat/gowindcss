@@ -81,6 +81,12 @@ const (
 	flexDirectionOrder
 )
 
+const (
+	keywordsOrder = iota
+	numbersOrder
+	fractionsOrder
+)
+
 type ArbitraryValueKeywordClass struct {
 	name     string
 	property string
@@ -389,7 +395,7 @@ func (a ArbitraryNumericalBaseClass) produceMap(config *Config) map[string]Order
 			css: CSS{
 				Declarations: []CSSDeclaration{{Property: a.property, Value: fmt.Sprint(n) + "rem"}},
 			},
-			order: a.order,
+			order: a.order + numbersOrder,
 		}
 	}
 	for _, fraction := range defaultFractions {
@@ -402,13 +408,13 @@ func (a ArbitraryNumericalBaseClass) produceMap(config *Config) map[string]Order
 			css: CSS{
 				Declarations: []CSSDeclaration{{Property: a.property, Value: fmt.Sprint(n) + "%"}},
 			},
-			order: a.order,
+			order: a.order + fractionsOrder,
 		}
 	}
 	for k, v := range a.keywords {
 		m[a.name+"-"+k] = OrderedCSS{
 			css:   CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
-			order: a.order,
+			order: a.order + keywordsOrder,
 		}
 	}
 	return m

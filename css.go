@@ -57,12 +57,25 @@ type OrderedCSS struct {
 	order int
 }
 
-func OrderedCSSLess(a string, b string, vs map[string]Variant, bs map[string]OrderedCSS) int {
-	acss := ParseString(a, vs, bs)[0]
-	bcss := ParseString(b, vs, bs)[0]
-	if acss.order < bcss.order {
+func OrderedCSSLess(a, b OrderedCSS) int {
+	if a.order < b.order {
 		return -1
-	} else if acss.order > bcss.order {
+	}
+	if a.order > b.order {
+		return 1
+	}
+	as := a.css.Selector
+	bs := b.css.Selector
+	if len(as) < len(bs) {
+		return -1
+	}
+	if len(as) > len(bs) {
+		return 1
+	}
+	if as < bs {
+		return -1
+	}
+	if as > bs {
 		return 1
 	}
 	return 0

@@ -1,9 +1,9 @@
-ordering of classes
-arbitrary values for base classes
-arbitrary variants
-some variants produce more than one css thing
-some variants add extra selectors (group and peer) (will have to do some heavy refactoring to handle this)
-customizing from a json file:
+ordering of classes - wip
+arbitrary values for base classes - done
+arbitrary variantsa - wip
+some variants produce more than one css thing - done :(
+some variants add extra selectors (group and peer) (will have to do some heavy refactoring to handle this) - barely started
+customizing from a json file: - wip
     They will move to customizing from a css file but
     will keep backwards compatability with the json file.
     I think I will target the json file then make an adaptor that
@@ -15,7 +15,7 @@ tailwind features they wish they did not have:
 
 
 my features:
-- dump base classes for ide
-- built in formatter for html, no need for prettier
-- offline documentation
-- offline repl (like play.tailwind.css)
+- dump base classes for ide - seems done
+- built in formatter for html, no need for prettier - kind of jank but its fine for now
+- offline documentation - early wip
+- offline repl (like play.tailwind.css) - super easy

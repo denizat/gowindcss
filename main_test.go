@@ -53,7 +53,6 @@ func Helper(fileName string, t *testing.T, bs map[string]OrderedCSS) {
 }
 
 func TestParseString(t *testing.T) {
-	//ParseString("focus-visible:grow-[0]", variants, HandleConfigFile(nil))
 	bs := HandleConfigFile(nil)
 	Helper("tests/defaultstests.txt", t, bs)
 	//fileName := "tests/config.json"
@@ -82,5 +81,14 @@ func FuzzParseString(f *testing.F) {
 	bs := MakeBaseClasses(nil)
 	f.Fuzz(func(t *testing.T, s string) {
 		ParseString(s, variants, bs)
+	})
+}
+
+func FuzzFormat(f *testing.F) {
+	bs := MakeBaseClasses(nil)
+	var nb = NilByteWriter{}
+	f.Fuzz(func(t *testing.T, s string) {
+		r := strings.NewReader(s)
+		Format(r, nb, variants, bs)
 	})
 }

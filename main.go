@@ -11,6 +11,7 @@ import (
 	"slices"
 	"sort"
 	"strings"
+	"text/tabwriter"
 )
 
 var cache map[string]OrderedCSS
@@ -29,17 +30,76 @@ func dumpCache() []OrderedCSS {
 }
 
 func main() {
+
 	var configFileName string
 	flag.StringVar(&configFileName, "c", "", "location of a configuration file, optional")
+	var dump bool
+	flag.BoolVar(&dump, "d", false, "dump all css generated from base classes")
+	formatFile := flag.String("f", "", "format the file")
+	// repl that can print out what class names will become and prints out their order number, but also
+	// can do formatting if you start the line with .f
+	repl := flag.Bool("r", false, "interactive mode")
+	_ = repl
+	list := flag.Bool("l", false, "list out base classes in order and the declarations they will generate")
+	_ = flag.String("i", "", "input css file")
+	_ = flag.String("o", "", "output css file") // or could do redirection?
 	flag.Parse()
-
-	// read config and create base classes
 
 	var bs map[string]OrderedCSS
 	if configFileName != "" {
 		bs = HandleConfigFile(&configFileName)
 	} else {
 		bs = MakeBaseClasses(nil)
+	}
+
+	if dump {
+		ks := []OrderedCSS{}
+		for k, v := range bs {
+			v.css.Selector = k
+			ks = append(ks, v)
+		}
+		slices.SortFunc(ks, func(a, b OrderedCSS) int {
+			return OrderedCSSLess(a, b)
+		})
+		fmt.Println(OrderedCSSArrToString(ks))
+		os.Exit(0)
+	}
+
+	if *list {
+		ks := []OrderedCSS{}
+		for k, v := range bs {
+			v.css.Selector = k
+			ks = append(ks, v)
+		}
+		slices.SortFunc(ks, func(a, b OrderedCSS) int {
+			return OrderedCSSLess(a, b)
+		})
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+		fmt.Fprintln(w, "class\torder number\tdeclarations\t")
+		for _, c := range ks {
+			fmt.Fprintf(w, "%s\t%d\t", c.css.Selector, c.order)
+			for _, d := range c.css.Declarations {
+				fmt.Fprintf(w, "%s: %s;\t", d.Property, d.Value)
+			}
+			fmt.Fprintln(w)
+		}
+		w.Flush()
+		os.Exit(0)
+	}
+
+	if *formatFile != "" {
+		inFile, err := os.Open(*formatFile)
+		if err != nil {
+			panic(err)
+		}
+		outFile, err := os.OpenFile(*formatFile, os.O_RDWR, 0777)
+		if err != nil {
+			panic(err)
+		}
+		reader := bufio.NewReader(inFile)
+		writer := bufio.NewWriter(outFile)
+		Format(reader, writer, variants, bs)
+		os.Exit(0)
 	}
 
 	// do the rest
@@ -142,7 +202,9 @@ func streamUntilMatch(r io.ByteReader, w io.ByteWriter, s string) {
 func realFormatGiveBetterName(s string, vs map[string]Variant, bs map[string]OrderedCSS) string {
 	classNames := strings.Split(s, " ")
 	slices.SortFunc(classNames, func(a, b string) int {
-		return OrderedCSSLess(a, b, vs, bs)
+		ac := ParseString(a, variants, bs)[0]
+		bc := ParseString(b, variants, bs)[0]
+		return OrderedCSSLess(ac, bc)
 	})
 	return strings.Join(classNames, " ")
 }

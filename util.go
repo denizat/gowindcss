@@ -26,3 +26,9 @@ func parseFraction(s string) (float64, error) {
 	}
 	return numerator / denominator, nil
 }
+
+type NilByteWriter struct{}
+
+func (n NilByteWriter) WriteByte(_ byte) error {
+	return nil
+}
