@@ -59,16 +59,9 @@ func main() {
 	}
 }
 
-func HandleConfigFile(fileName *string) map[string]OrderedCSS {
-	if fileName == nil {
-		return MakeBaseClasses(nil)
-	}
-	bs, err := os.ReadFile(*fileName)
-	if err != nil {
-		panic(err)
-	}
+func ParseConfigFile(file []byte) map[string]OrderedCSS {
 	var config Config
-	json.Unmarshal(bs, &config)
+	json.Unmarshal(file, &config)
 	if config.Theme.Colors != nil {
 		defaultColors = config.Theme.Colors
 	}
@@ -82,6 +75,18 @@ func HandleConfigFile(fileName *string) map[string]OrderedCSS {
 		maps.Copy(defaultColors, config.Theme.Extend.Screens)
 	}
 	return MakeBaseClasses(&config)
+
+}
+
+func HandleConfigFile(fileName *string) map[string]OrderedCSS {
+	if fileName == nil {
+		return MakeBaseClasses(nil)
+	}
+	bs, err := os.ReadFile(*fileName)
+	if err != nil {
+		panic(err)
+	}
+	return ParseConfigFile(bs)
 }
 
 func Format(r io.ByteReader, w io.ByteWriter, vs map[string]Variant, bs map[string]OrderedCSS) {

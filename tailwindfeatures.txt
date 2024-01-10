@@ -18,4 +18,4 @@ my features:
 - dump base classes for ide
 - built in formatter for html, no need for prettier
 - offline documentation
-- offline repl (play.tailwind.css)
+- offline repl (like play.tailwind.css)
