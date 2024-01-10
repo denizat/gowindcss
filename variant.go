@@ -1,5 +1,7 @@
 package main
 
+type VariantMap map[string]Variant
+
 // https://tailwindcss.com/docs/hover-focus-and-other-states
 type Variant interface {
 	convert(arbitaryValue *string, c CSS) []CSS

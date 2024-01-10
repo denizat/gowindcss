@@ -32,3 +32,7 @@ type NilByteWriter struct{}
 func (n NilByteWriter) WriteByte(_ byte) error {
 	return nil
 }
+
+func isLowerAlnum(b byte) bool {
+	return b >= 'a' || b <= 'z' || b >= '0' || b <= '9'
+}

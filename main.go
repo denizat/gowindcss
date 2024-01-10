@@ -55,7 +55,7 @@ func main() {
 	if dump {
 		ks := []OrderedCSS{}
 		for k, v := range bs {
-			v.css.Selector = k
+			v.Selector = k
 			ks = append(ks, v)
 		}
 		slices.SortFunc(ks, func(a, b OrderedCSS) int {
@@ -68,7 +68,7 @@ func main() {
 	if *list {
 		ks := []OrderedCSS{}
 		for k, v := range bs {
-			v.css.Selector = k
+			v.Selector = k
 			ks = append(ks, v)
 		}
 		slices.SortFunc(ks, func(a, b OrderedCSS) int {
@@ -77,8 +77,8 @@ func main() {
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 		fmt.Fprintln(w, "class\torder number\tdeclarations\t")
 		for _, c := range ks {
-			fmt.Fprintf(w, "%s\t%d\t", c.css.Selector, c.order)
-			for _, d := range c.css.Declarations {
+			fmt.Fprintf(w, "%s\t%d\t", c.Selector, c.order)
+			for _, d := range c.Declarations {
 				fmt.Fprintf(w, "%s: %s;\t", d.Property, d.Value)
 			}
 			fmt.Fprintln(w)

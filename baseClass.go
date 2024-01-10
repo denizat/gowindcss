@@ -5,10 +5,12 @@ import (
 	"strconv"
 )
 
+type BaseClassMap map[string]OrderedCSS
+
 type BaseClass interface {
 	produceMap(config *Config) map[string]OrderedCSS
 }
-type ArbitraryValue interface {
+type ArbitraryValueClass interface {
 	arbitraryValue(v string) OrderedCSS
 	baseForArbitraryValue() string
 }
@@ -57,7 +59,7 @@ func MakeBaseClasses(config *Config) map[string]OrderedCSS {
 	)
 }
 
-var baseClassesArbitrary = map[string]ArbitraryValue{
+var baseClassesArbitrary = map[string]ArbitraryValueClass{
 	aspectRatio.baseForArbitraryValue():     aspectRatio,
 	columns.baseForArbitraryValue():         columns,
 	flexBasis.baseForArbitraryValue():       flexBasis,
@@ -96,10 +98,8 @@ type ArbitraryValueKeywordClass struct {
 
 func (a ArbitraryValueKeywordClass) arbitraryValue(v string) OrderedCSS {
 	return OrderedCSS{
-		css: CSS{
-			Declarations: []CSSDeclaration{{a.property, v}},
-		},
-		order: a.order,
+		CSS{Declarations: []CSSDeclaration{{a.property, v}}},
+		a.order,
 	}
 }
 func (a ArbitraryValueKeywordClass) produceMap(config *Config) map[string]OrderedCSS {
@@ -110,10 +110,8 @@ func (a ArbitraryValueKeywordClass) produceMap(config *Config) map[string]Ordere
 			n += "-" + k
 		}
 		m[n] = OrderedCSS{
-			css: CSS{
-				Declarations: []CSSDeclaration{{a.property, v}},
-			},
-			order: a.order,
+			CSS{Declarations: []CSSDeclaration{{a.property, v}}},
+			a.order,
 		}
 	}
 	return m
@@ -185,10 +183,8 @@ func (a KeywordBaseClass) produceMap(config *Config) map[string]OrderedCSS {
 	for k, v := range a.values {
 		n := a.name + "-" + k
 		m[n] = OrderedCSS{
-			css: CSS{
-				Declarations: []CSSDeclaration{{a.property, v}},
-			},
-			order: a.order,
+			CSS{Declarations: []CSSDeclaration{{a.property, v}}},
+			a.order,
 		}
 	}
 	return m
@@ -328,10 +324,8 @@ func (r RandomKeywordBaseClass) produceMap(config *Config) map[string]OrderedCSS
 	m := map[string]OrderedCSS{}
 	for k, v := range r.keywords {
 		m[k] = OrderedCSS{
-			css: CSS{
-				Declarations: []CSSDeclaration{{Property: r.property, Value: v}},
-			},
-			order: r.order,
+			CSS{Declarations: []CSSDeclaration{{Property: r.property, Value: v}}},
+			r.order,
 		}
 	}
 	return m
@@ -392,10 +386,8 @@ func (a ArbitraryNumericalBaseClass) produceMap(config *Config) map[string]Order
 			continue
 		}
 		m[a.name+"-"+num] = OrderedCSS{
-			css: CSS{
-				Declarations: []CSSDeclaration{{Property: a.property, Value: fmt.Sprint(n) + "rem"}},
-			},
-			order: a.order + numbersOrder,
+			CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: fmt.Sprint(n) + "rem"}}},
+			a.order + numbersOrder,
 		}
 	}
 	for _, fraction := range defaultFractions {
@@ -405,16 +397,14 @@ func (a ArbitraryNumericalBaseClass) produceMap(config *Config) map[string]Order
 			continue
 		}
 		m[a.name+"-"+fraction] = OrderedCSS{
-			css: CSS{
-				Declarations: []CSSDeclaration{{Property: a.property, Value: fmt.Sprint(n) + "%"}},
-			},
-			order: a.order + fractionsOrder,
+			CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: fmt.Sprint(n) + "%"}}},
+			a.order + fractionsOrder,
 		}
 	}
 	for k, v := range a.keywords {
 		m[a.name+"-"+k] = OrderedCSS{
-			css:   CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
-			order: a.order + keywordsOrder,
+			CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
+			a.order + keywordsOrder,
 		}
 	}
 	return m
@@ -422,8 +412,8 @@ func (a ArbitraryNumericalBaseClass) produceMap(config *Config) map[string]Order
 
 func (a ArbitraryNumericalBaseClass) arbitraryValue(v string) OrderedCSS {
 	return OrderedCSS{
-		css:   CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
-		order: a.order,
+		CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
+		a.order,
 	}
 }
 func (a ArbitraryNumericalBaseClass) baseForArbitraryValue() string {
@@ -450,10 +440,8 @@ func (a ArbitraryColorBaseClass) produceMap(config *Config) map[string]OrderedCS
 	m := map[string]OrderedCSS{}
 	for k, v := range defaultColors {
 		m[a.name+"-"+k] = OrderedCSS{
-			css: CSS{
-				Declarations: []CSSDeclaration{{Property: a.property, Value: v}},
-			},
-			order: a.order,
+			CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
+			a.order,
 		}
 	}
 	return m
@@ -463,8 +451,8 @@ func (a ArbitraryColorBaseClass) baseForArbitraryValue() string {
 }
 func (a ArbitraryColorBaseClass) arbitraryValue(v string) OrderedCSS {
 	return OrderedCSS{
-		css:   CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
-		order: a.order,
+		CSS{Declarations: []CSSDeclaration{{Property: a.property, Value: v}}},
+		a.order,
 	}
 }
 
