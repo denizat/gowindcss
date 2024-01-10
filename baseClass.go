@@ -6,7 +6,7 @@ import (
 )
 
 type BaseClass interface {
-	produceMap(config map[string]any) map[string]OrderedCSS
+	produceMap(config *Config) map[string]OrderedCSS
 }
 type ArbitraryValue interface {
 	arbitraryValue(v string) OrderedCSS

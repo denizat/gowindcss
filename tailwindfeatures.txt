@@ -17,5 +17,5 @@ tailwind features they wish they did not have:
 my features:
 - dump base classes for ide - seems done
 - built in formatter for html, no need for prettier - kind of jank but its fine for now
-- offline documentation - early wip
+- offline documentation - cli doc wip
 - offline repl (like play.tailwind.css) - super easy

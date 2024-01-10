@@ -57,6 +57,41 @@ type OrderedCSS struct {
 	order int
 }
 
+type OCSS struct {
+	CSS
+	order int
+}
+
+var thing = OCSS{
+	CSS{
+		Selector:           "",
+		GroupSelector:      "",
+		PeerSelector:       "",
+		PseudoClasses:      nil,
+		PseudoElements:     nil,
+		ChildCombinator:    "",
+		MediaQueries:       nil,
+		SupportsStatements: nil,
+		AttributeSelectors: nil,
+		Declarations:       nil,
+	},
+	0,
+}
+var other = thing.order
+
+type parsedVariant struct {
+	name          string
+	arbitraryText string // use the zero value lol
+}
+type parsedClass struct {
+	name          string
+	arbitraryText string
+}
+type parsedThing struct {
+	variants []parsedVariant
+	class    parsedClass
+}
+
 func OrderedCSSLess(a, b OrderedCSS) int {
 	if a.order < b.order {
 		return -1
