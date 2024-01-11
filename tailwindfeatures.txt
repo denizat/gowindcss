@@ -1,24 +1,38 @@
-ordering of classes - wip
-arbitrary values for base classes - done
-arbitrary variants - wip
-some variants produce more than one css thing - done :(
-some variants add extra selectors (group and peer) not too bad - barely started
-customizing from a json file: - wip
-    They will move to customizing from a css file but
-    will keep backwards compatability with the json file.
-    I think I will target the json file then make an adaptor that
-    takes their css file and turns it into JSON for my code to understand.
+similarities with tailwind
+- all same default base classes
+- almost all same default variants
+- ordered classes
+- arbitrary values for base classes
+- arbitrary values for variants
+- marker variant support
+- theme() and spacing() functions
+- group and peer support
 
+differences from tailwind
 
-tailwind features they wish they did not have:
-    @apply (use theme() and spacing() instead)
+pro
+- built in html formatter (maybe add linter)
+- built in ide support (dump base classes)
+- built in playground
+- built in documentation (offline)
+- no @apply
+- [] <- arbitrary base class (could be horrible too though)
 
+- built with only dependency on golang standard library for the distributed binary
+- built with only one language
+- much faster
+- much smaller binary size
+- much simpler
 
-my features:
-- dump base classes for ide - seems done
-- built in formatter for html, no need for prettier - kind of jank but its fine for now
-- offline documentation - cli doc wip
-- offline repl (like play.tailwind.css) - super easy
+con
+- not as well developed
+- no support for *: or []:
+- no @apply
+- no external plugins
+
+neuter
+- tailwind.config.js -> gowind.json
+
 
 I am not sure if the / syntax should exist.
 It just makes parsing harder and creates one more thing for the user to think about.
