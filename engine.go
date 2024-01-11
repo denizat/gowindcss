@@ -62,78 +62,77 @@ func grabFirstPossibleValidString(r io.ByteReader) string {
 }
 
 func parsestr(s string) *fullClassInformation {
-	var name strings.Builder
 	r := strings.NewReader(s)
 	var res fullClassInformation
 	for {
-		b, err := r.ReadByte()
-		// stream ended
-		if err != nil {
-			if name.Len() == 0 {
-				return nil
-			}
-			res.class = parsedValue{name: name.String(), arbitraryText: ""}
+		pv, variant := parseNextPart(r)
+		if pv == nil {
+			return nil
+		}
+		if variant {
+			res.variants = append(res.variants, *pv)
+		} else {
+			res.class = *pv
 			return &res
 		}
+	}
+}
+
+// returns the parsed value and if it was a variant or not
+// returns nil if unable to parse, if it returns nil then the bool does not matter
+func parseNextPart(r io.ByteReader) (*parsedValue, bool) {
+	// I might be able to flatten this function by storing some state
+	// and updating all the top level if statements to check that state first
+	var name strings.Builder
+	for {
+		b, err := r.ReadByte()
+		if err != nil {
+			return &parsedValue{name: name.String()}, false
+		}
+		if b == ':' {
+			return &parsedValue{name: name.String()}, true
+		}
+		// I do not know how to flatten this
 		if b == '[' {
-			arb := parseArbitrary(r)
-			if arb == nil {
-				return nil
+			res := parseArbitrary(r)
+			if res == nil {
+				return nil, false
 			}
-			b, err = r.ReadByte()
-			// end of string, return class
+			// next read must be EOF or slash or colon
+			b, err := r.ReadByte()
 			n := name.String()
-			name.Reset()
 			if len(n) > 0 {
 				n = n[:len(n)-1]
 			}
+			pv := &parsedValue{name: n, arbitraryText: *res}
 			if err != nil {
-				res.class = parsedValue{name: n, arbitraryText: *arb}
-				return &res
+				return pv, false
 			}
 			if b == ':' {
-				res.variants = append(res.variants, parsedValue{name: n, arbitraryText: *arb})
-			} else if b == '/' {
-				slash, colon := parseSlash(r)
-				// not certain if we should not accept empty slashes
-				if slash == "" {
-					return nil
-				}
-				if colon {
-					res.variants = append(res.variants, parsedValue{
-						name:          n,
-						arbitraryText: *arb,
-						slashText:     slash,
-					})
-				} else {
-					res.class = parsedValue{
-						name:          n,
-						arbitraryText: *arb,
-						slashText:     slash,
-					}
-					return &res
-				}
-			} else {
-				// malformed
-				return nil
+				return pv, true
 			}
-		} else if b == ':' {
-			res.variants = append(res.variants, parsedValue{
-				name:          name.String(),
-				arbitraryText: "",
-			})
-			name.Reset()
+			if b == '/' {
+				slash, colon := parseSlash(r)
+				if slash == "" {
+					return nil, false
+				}
+				pv.slashText = slash
+				if colon {
+					return pv, true
+				} else {
+					return pv, false
+				}
+			}
 		} else if b == '/' {
 			slash, colon := parseSlash(r)
 			if slash == "" {
-				return nil
+				return nil, false
 			}
+			pv := &parsedValue{name: name.String(), slashText: slash}
 			if colon {
-				res.variants = append(res.variants, parsedValue{name: name.String()})
-				name.Reset()
+				return pv, true
 			} else {
-				res.class = parsedValue{name: name.String(), slashText: slash}
-				return &res
+				return pv, false
 			}
 		} else {
 			name.WriteByte(b)
