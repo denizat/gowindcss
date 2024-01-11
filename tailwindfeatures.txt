@@ -1,8 +1,8 @@
 ordering of classes - wip
 arbitrary values for base classes - done
-arbitrary variantsa - wip
+arbitrary variants - wip
 some variants produce more than one css thing - done :(
-some variants add extra selectors (group and peer) (will have to do some heavy refactoring to handle this) - barely started
+some variants add extra selectors (group and peer) not too bad - barely started
 customizing from a json file: - wip
     They will move to customizing from a css file but
     will keep backwards compatability with the json file.
@@ -19,3 +19,9 @@ my features:
 - built in formatter for html, no need for prettier - kind of jank but its fine for now
 - offline documentation - cli doc wip
 - offline repl (like play.tailwind.css) - super easy
+
+I am not sure if the / syntax should exist.
+It just makes parsing harder and creates one more thing for the user to think about.
+I think it would be better if we did multiple arbitrary variants.
+I am going to implement it anyways just to say that I really supported all the features.
+However, if I will turn this into a real tool, I might remove some cruft of the language before 1.0.

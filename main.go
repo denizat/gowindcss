@@ -37,7 +37,7 @@ func main() {
 	flag.BoolVar(&dump, "d", false, "dump all css generated from base classes")
 	formatFile := flag.String("f", "", "format the file")
 	// repl that can print out what class names will become and prints out their order number, but also
-	// can do formatting if you start the line with .f
+	// can do formatting if you start the line with "
 	repl := flag.Bool("r", false, "interactive mode")
 	_ = repl
 	list := flag.Bool("l", false, "list out base classes in order and the declarations they will generate")
@@ -202,8 +202,8 @@ func streamUntilMatch(r io.ByteReader, w io.ByteWriter, s string) {
 func realFormatGiveBetterName(s string, vs map[string]Variant, bs map[string]OrderedCSS) string {
 	classNames := strings.Split(s, " ")
 	slices.SortFunc(classNames, func(a, b string) int {
-		ac := ParseString(a, variants, bs)[0]
-		bc := ParseString(b, variants, bs)[0]
+		ac := ParseString(a, vs, bs)[0]
+		bc := ParseString(b, vs, bs)[0]
 		return OrderedCSSLess(ac, bc)
 	})
 	return strings.Join(classNames, " ")

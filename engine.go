@@ -9,6 +9,7 @@ import (
 type parsedValue struct {
 	name          string
 	arbitraryText string
+	slashText     string
 }
 type fullClassInformation struct {
 	variants []parsedValue
@@ -92,6 +93,26 @@ func parsestr(s string) *fullClassInformation {
 			}
 			if b == ':' {
 				res.variants = append(res.variants, parsedValue{name: n, arbitraryText: *arb})
+			} else if b == '/' {
+				slash, colon := parseSlash(r)
+				// not certain if we should not accept empty slashes
+				if slash == "" {
+					return nil
+				}
+				if colon {
+					res.variants = append(res.variants, parsedValue{
+						name:          n,
+						arbitraryText: *arb,
+						slashText:     slash,
+					})
+				} else {
+					res.class = parsedValue{
+						name:          n,
+						arbitraryText: *arb,
+						slashText:     slash,
+					}
+					return &res
+				}
 			} else {
 				// malformed
 				return nil
@@ -102,6 +123,18 @@ func parsestr(s string) *fullClassInformation {
 				arbitraryText: "",
 			})
 			name.Reset()
+		} else if b == '/' {
+			slash, colon := parseSlash(r)
+			if slash == "" {
+				return nil
+			}
+			if colon {
+				res.variants = append(res.variants, parsedValue{name: name.String()})
+				name.Reset()
+			} else {
+				res.class = parsedValue{name: name.String(), slashText: slash}
+				return &res
+			}
 		} else {
 			name.WriteByte(b)
 		}
@@ -124,6 +157,24 @@ func parseArbitrary(r io.ByteReader) *string {
 		if b == ']' {
 			s := sb.String()
 			return &s
+		}
+		sb.WriteByte(b)
+	}
+}
+
+// only stops at colons
+// returns the text after the slash and if it ended with a colon
+// if it returns false that means the stream ended
+func parseSlash(r io.ByteReader) (string, bool) {
+	var sb strings.Builder
+	for {
+		b, err := r.ReadByte()
+		// end of string just return
+		if err != nil {
+			return sb.String(), false
+		}
+		if b == ':' {
+			return sb.String(), true
 		}
 		sb.WriteByte(b)
 	}
@@ -154,7 +205,7 @@ func createCSSFromClassInformation(c fullClassInformation, selector string, vs m
 		}
 		l := len(csses)
 		for j := 0; j < l; j++ {
-			res := v.convert(variant.arbitraryText, csses[j].CSS)
+			res := v.convert(variant.arbitraryText, "", csses[j].CSS)
 			if res == nil {
 				return nil
 			}

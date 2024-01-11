@@ -124,6 +124,28 @@ func TestParse(t *testing.T) {
 	act = *parse(s)
 	assert.Equal(ex, act)
 
+	s = "a/b"
+	ex = fullClassInformation{
+		class: parsedValue{name: "a", slashText: "b"}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "a-[zz]/b:c"
+	ex = fullClassInformation{
+		variants: []parsedValue{{name: "a", arbitraryText: "zz", slashText: "b"}},
+		class:    parsedValue{name: "c"},
+	}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "a-[zz]/b-[car]:c/d"
+	ex = fullClassInformation{
+		variants: []parsedValue{{name: "a", arbitraryText: "zz", slashText: "b-[car]"}},
+		class:    parsedValue{name: "c", slashText: "d"},
+	}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
 }
 
 func FuzzParseString(f *testing.F) {
