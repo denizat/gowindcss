@@ -129,7 +129,6 @@ func parseArbitrary(r io.ByteReader) *string {
 	}
 }
 
-// TODO: add support for parsing arbitrary variants and values
 func createCSSFromClassInformation(c fullClassInformation, selector string, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
 	var css OrderedCSS
 	if c.class.arbitraryText == "" {
