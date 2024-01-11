@@ -25,3 +25,12 @@ It just makes parsing harder and creates one more thing for the user to think ab
 I think it would be better if we did multiple arbitrary variants.
 I am going to implement it anyways just to say that I really supported all the features.
 However, if I will turn this into a real tool, I might remove some cruft of the language before 1.0.
+
+I think tailwind css uses string concatenation to build up their selectors.
+I use a selector struct and turn it into a string when I want to print it.
+The difference between these two methods prevents me from doing the "[]:" arbitrary variant as easily as they can.
+I will skip over this feature for now but it could always be introduced as just another variant plugin.
+Although I would have to create a special parser to put the arbitrary data into my struct.
+That is too much complexity, and I am not sure how useful this feature is.
+We already support arbitrary variants, so if we had a great selection of base variants then "[]:" would not be needed.
+The same could be said about the arbitrary declaration base class, but I am keeping it because of how simple it was to implement.

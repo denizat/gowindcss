@@ -54,7 +54,7 @@ func grabFirstPossibleValidString(r io.ByteReader) string {
 	var sb strings.Builder
 	for {
 		b, err := r.ReadByte()
-		if err != nil || b == ' ' || b == '\n' || b == '\t' || b == '\'' || b == '"' || b == '`' {
+		if err != nil || b == ' ' || b == '\n' || b == '\t' || b == '"' || b == '`' {
 			return sb.String()
 		}
 		sb.WriteByte(b)
