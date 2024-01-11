@@ -75,6 +75,57 @@ func TestFormat(t *testing.T) {
 	}
 }
 
+func TestParse(t *testing.T) {
+	assert := assert.New(t)
+	var s string
+	var ex fullClassInformation
+	var act fullClassInformation
+
+	s = "abc"
+	ex = fullClassInformation{class: parsedValue{name: "abc", arbitraryText: ""}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "abc-abc"
+	ex = fullClassInformation{class: parsedValue{name: "abc-abc", arbitraryText: ""}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "abc-abc-[100]"
+	ex = fullClassInformation{class: parsedValue{name: "abc-abc", arbitraryText: "100"}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "a:b"
+	ex = fullClassInformation{
+		variants: []parsedValue{
+			{name: "a", arbitraryText: ""},
+		},
+		class: parsedValue{name: "b", arbitraryText: ""}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "a-[100]:b-[200]"
+	ex = fullClassInformation{
+		variants: []parsedValue{
+			{name: "a", arbitraryText: "100"},
+		},
+		class: parsedValue{name: "b", arbitraryText: "200"}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+	s = "[100]:[200]:[300]"
+	ex = fullClassInformation{
+		variants: []parsedValue{
+			{name: "", arbitraryText: "100"},
+			{name: "", arbitraryText: "200"},
+		},
+		class: parsedValue{name: "", arbitraryText: "300"}}
+	act = *parse(s)
+	assert.Equal(ex, act)
+
+}
+
 func FuzzParseString(f *testing.F) {
 	f.Add("aspect-video")
 	f.Add("-[0-[")

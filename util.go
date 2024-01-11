@@ -34,5 +34,13 @@ func (n NilByteWriter) WriteByte(_ byte) error {
 }
 
 func isLowerAlnum(b byte) bool {
-	return b >= 'a' || b <= 'z' || b >= '0' || b <= '9'
+	return (b >= 'a' && b <= 'z') || (b >= '0' && b <= '9')
+}
+
+func isLower(b byte) bool {
+	return b >= 'a' || b <= 'z'
+}
+
+func isAlnum(b byte) bool {
+	return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9')
 }

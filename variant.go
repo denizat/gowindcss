@@ -4,7 +4,7 @@ type VariantMap map[string]Variant
 
 // https://tailwindcss.com/docs/hover-focus-and-other-states
 type Variant interface {
-	convert(arbitaryValue *string, c CSS) []CSS
+	convert(arbitaryValue string, c CSS) []CSS
 	base() string
 }
 
@@ -31,10 +31,7 @@ type PseudoClassVariant struct {
 	name string
 }
 
-func (p PseudoClassVariant) convert(arbitaryValue *string, c CSS) []CSS {
-	if arbitaryValue != nil {
-		panic("expected arbitrary value to be nil")
-	}
+func (p PseudoClassVariant) convert(arbitaryValue string, c CSS) []CSS {
 	c.PseudoClasses = append(c.PseudoClasses, p.name)
 	return []CSS{c}
 }
@@ -61,10 +58,7 @@ func PseudoElementNameSameAsValue(n string) PseudoElementVariant {
 	return PseudoElementVariant{name: n, value: n}
 }
 
-func (p PseudoElementVariant) convert(arbitaryValue *string, c CSS) []CSS {
-	if arbitaryValue != nil {
-		panic("expected arbitrary value to be nil")
-	}
+func (p PseudoElementVariant) convert(arbitaryValue string, c CSS) []CSS {
 	c.PseudoElements = append(c.PseudoClasses, p.name)
 	return []CSS{c}
 }
@@ -84,7 +78,7 @@ var pseudoElementVariants = []PseudoElementVariant{
 
 type DoublePsuedoElementVariant struct{ name string }
 
-func (m DoublePsuedoElementVariant) convert(arbitraryValue *string, c CSS) []CSS {
+func (m DoublePsuedoElementVariant) convert(arbitraryValue string, c CSS) []CSS {
 	c.PseudoElements = append(c.PseudoElements, m.name)
 	cc := CSSDeepCopy(c)
 	cc.ChildCombinator = "*"
@@ -166,8 +160,8 @@ func genBreakpointsVariant(_ *Config) []Variant {
 	return arr
 }
 
-func (b BreakpointsVariant) convert(arbitraryValue *string, c CSS) []CSS {
-	if arbitraryValue != nil {
+func (b BreakpointsVariant) convert(arbitraryValue string, c CSS) []CSS {
+	if arbitraryValue != "" {
 		return nil
 	}
 	c.MediaQueries = append(c.MediaQueries, "min-width: "+b.value)
