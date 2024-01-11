@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type BaseClassMap map[string]OrderedCSS
@@ -60,12 +61,13 @@ func MakeBaseClasses(config *Config) map[string]OrderedCSS {
 }
 
 var baseClassesArbitrary = map[string]ArbitraryValueClass{
-	aspectRatio.baseForArbitraryValue():     aspectRatio,
-	columns.baseForArbitraryValue():         columns,
-	flexBasis.baseForArbitraryValue():       flexBasis,
-	grow.baseForArbitraryValue():            grow,
-	backgroundColor.baseForArbitraryValue(): backgroundColor,
-	textColor.baseForArbitraryValue():       textColor,
+	totallyArbitraryLOL.baseForArbitraryValue(): totallyArbitraryLOL,
+	aspectRatio.baseForArbitraryValue():         aspectRatio,
+	columns.baseForArbitraryValue():             columns,
+	flexBasis.baseForArbitraryValue():           flexBasis,
+	grow.baseForArbitraryValue():                grow,
+	backgroundColor.baseForArbitraryValue():     backgroundColor,
+	textColor.baseForArbitraryValue():           textColor,
 }
 
 // TODO: reorder this to fit what tailwind does
@@ -81,6 +83,7 @@ const (
 
 	growOrder
 	flexDirectionOrder
+	totallyArbitraryLOLOrder
 )
 
 const (
@@ -141,6 +144,31 @@ var aspectRatio = ArbitraryValueKeywordClass{
 	},
 	order: aspectRatioOrder,
 }
+
+type LOLOLOL struct{}
+
+func (L LOLOLOL) arbitraryValue(v string) OrderedCSS {
+	declsStrs := strings.Split(v, ";")
+	decls := []CSSDeclaration{}
+	for _, s := range declsStrs {
+		parts := strings.Split(s, ":")
+		if len(parts) == 2 {
+
+			decls = append(decls, CSSDeclaration{parts[0], parts[1]})
+		} else {
+			decls = append(decls, CSSDeclaration{parts[0], ""})
+		}
+	}
+	return OrderedCSS{
+		CSS{Declarations: decls}, totallyArbitraryLOLOrder,
+	}
+}
+
+func (L LOLOLOL) baseForArbitraryValue() string {
+	return ""
+}
+
+var totallyArbitraryLOL = LOLOLOL{}
 
 var columns = ArbitraryValueKeywordClass{
 	name:     "columns",
