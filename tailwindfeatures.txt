@@ -34,3 +34,10 @@ Although I would have to create a special parser to put the arbitrary data into 
 That is too much complexity, and I am not sure how useful this feature is.
 We already support arbitrary variants, so if we had a great selection of base variants then "[]:" would not be needed.
 The same could be said about the arbitrary declaration base class, but I am keeping it because of how simple it was to implement.
+
+Tailwind has some crazy things that are crazy to implement.
+Namely *: because it shifts the target of the variants to a > * instead of the first selector.
+Also []: because it does a lot of crazy stuff with the string.
+I am just going to have to accept defeat and do an 80/20 solution.
+When you are doing something that complex anyways it would probably be good to just use normal css.
+I could probably support all of tailwind but it would be too crazy.
