@@ -6,16 +6,9 @@ import (
 	"strings"
 )
 
-//const (
-//	_ = iota
-//	variantForm
-//	classForm
-//)
-
 type parsedValue struct {
 	name          string
 	arbitraryText string
-	//form int
 }
 type fullClassInformation struct {
 	variants []parsedValue
@@ -24,10 +17,6 @@ type fullClassInformation struct {
 
 func parse(s string) *fullClassInformation {
 	return parsestr(s)
-}
-
-func generate(f fullClassInformation, vs VariantMap, bs BaseClassMap) []OrderedCSS {
-	return nil
 }
 
 func ParseString(s string, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
@@ -41,42 +30,6 @@ func ParseString(s string, vs map[string]Variant, bs map[string]OrderedCSS) []Or
 		csses = append(csses, res...)
 	}
 }
-
-/*
-Thinking
-what do I want to do
-I want to have more control over how the class name is parsed
-so that I can handle more complex usecases in the future
-like anonymous arbitraries
-
-possible matches:
-abc
-abc-abc
-abc:abc
-abc:abc-abc
-abc:abc-abc:abc
-abc-[abc]
-abc-[abc]:abc
-[abc]
-[abc]:abc
-[abc]:[abc]
-
-note after an arbitrary there must either be a break or a colon
-a break is whitespace or a quote or other things that I have not thought of
-
-possible first chars
-[a-z\-\[]
-if first char is [ then we are in an arbitrary
-else then possible chars is [a-z\-]
-if char is - then next char must be in [a-z\[]
-
-if a-z\- then get word
-if \[ then get arb
-else quit
-
-word is [a-z0-9]+
-
-*/
 
 func ProduceNextCSS(r io.ByteReader, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
 	for {
@@ -94,16 +47,6 @@ func ProduceNextCSS(r io.ByteReader, vs map[string]Variant, bs map[string]Ordere
 		}
 	}
 
-	//for {
-	//	rf := readNextClass(r)
-	//	if rf == nil {
-	//		return nil
-	//	}
-	//	res := createCSSFromClassInformation(*rf, vs, bs)
-	//	if res != nil {
-	//		return res
-	//	}
-	//}
 }
 
 func grabFirstPossibleValidString(r io.ByteReader) string {
@@ -117,65 +60,6 @@ func grabFirstPossibleValidString(r io.ByteReader) string {
 	}
 }
 
-//func readNextClass(r io.ByteReader) *fullClassInformation {
-//	var vars []parsedValue
-//	for {
-//		v := getNextValue(r)
-//		if v == nil {
-//			return nil
-//		}
-//		if v.form == variantForm {
-//			vars = append(vars, *v)
-//		} else if v.form == classForm {
-//			return &fullClassInformation{variants: vars, class: *v}
-//		}
-//	}
-//}
-//
-//func getNextValue(r io.ByteReader) *parsedValue {
-//	var name strings.Builder
-//	arbitraryValue := ""
-//	for {
-//		b, err := r.ReadByte()
-//		// TODO: handle this error better
-//		if err != nil {
-//			if name.Len() > 0 {
-//				return &parsedValue{name: name.String(), arbitraryText: arbitraryValue, form: classForm}
-//			}
-//			return nil
-//		}
-//		if possibleNameByte(b) {
-//			name.WriteByte(b)
-//		} else if b == '[' {
-//			arbitraryValue = parseArbitrary(r)
-//			b, _ = r.ReadByte()
-//			if arbitraryValue == "" || possibleNameByte(b) {
-//				name.Reset()
-//				arbitraryValue = ""
-//				continue
-//			}
-//			s := name.String()
-//			if len(s) > 0 {
-//				s = s[:len(s)-1]
-//			}
-//			if b == ':' {
-//				return &parsedValue{name: s, arbitraryText: arbitraryValue, form: variantForm}
-//			}
-//			return &parsedValue{name: s, arbitraryText: arbitraryValue, form: classForm}
-//		} else if b == ':' {
-//			return &parsedValue{name: name.String(), arbitraryText: "", form: variantForm}
-//		} else {
-//			var t io.ByteScanner
-//			return &parsedValue{name: name.String(), arbitraryText: "", form: classForm}
-//		}
-//	}
-//}
-
-// the whole string will be the selector
-// "abc" <- valid input
-// "abc def" <- invalid input
-// every single character in this string will be from the valid character set
-// basically anything other than whitespace
 func parsestr(s string) *fullClassInformation {
 	var name strings.Builder
 	r := strings.NewReader(s)
@@ -222,10 +106,6 @@ func parsestr(s string) *fullClassInformation {
 			name.WriteByte(b)
 		}
 	}
-}
-
-func possibleNameByte(b byte) bool {
-	return isAlnum(b) || b == '-'
 }
 
 // [abc] returns "abc"
