@@ -284,8 +284,8 @@ func CSSDeepCopy(c CSS) CSS {
 }
 
 func OrderedCSSDeepCopy(c OrderedCSS) OrderedCSS {
-	copy := CSSDeepCopy(c.CSS)
-	return OrderedCSS{copy, c.order}
+	cpy := CSSDeepCopy(c.CSS)
+	return OrderedCSS{cpy, c.order}
 }
 
 func OrderedCSSLess(a, b OrderedCSS) int {
@@ -649,10 +649,11 @@ var baseClassesArbitrary = map[string]ArbitraryValueClass{
 	textColor.baseForArbitraryValue():           textColor,
 }
 
-// TODO: reorder this to fit what tailwind does
+// ORDERS TODO: reorder this to fit what tailwind does
 const (
 	_ = iota * 100
 
+	boxSizingOrder
 	aspectRatioOrder
 	columnsOrder
 	breakBeforeOrder
@@ -662,6 +663,8 @@ const (
 
 	growOrder
 	flexDirectionOrder
+	boxDecorationOrder
+	// should always be last I think
 	totallyArbitraryLOLOrder
 )
 
@@ -868,7 +871,7 @@ var boxDecoration = KeywordBaseClass{
 		"clone": "clone",
 		"slice": "slice",
 	},
-	order: 0,
+	order: boxDecorationOrder,
 }
 var boxSizing = KeywordBaseClass{
 	name:     "box",
@@ -877,7 +880,7 @@ var boxSizing = KeywordBaseClass{
 		"border":  "border-box",
 		"content": "content-box",
 	},
-	order: 0,
+	order: boxSizingOrder,
 }
 
 var floats = KeywordBaseClass{

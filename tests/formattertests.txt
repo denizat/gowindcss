@@ -19,5 +19,12 @@
 <div class="break-after-auto break-inside-auto"></div>
 <div class="break-inside-auto break-after-auto"></div>
 
+<div class="box-decoration-clone flex-row"></div>
+<div class="flex-row box-decoration-clone"></div>
+
+<div class="aspect-auto box-border"></div>
+<div class="box-border aspect-auto"></div>
+
+
 # <div class="hover:aspect-square aspect-video"></div>
 # <div class="aspect-video hover:aspect-square"></div>
