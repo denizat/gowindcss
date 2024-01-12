@@ -25,6 +25,9 @@
 <div class="aspect-auto box-border"></div>
 <div class="box-border aspect-auto"></div>
 
+<div class="aspect-auto box-border block"></div>
+<div class="box-border block aspect-auto"></div>
+
 
 # <div class="hover:aspect-square aspect-video"></div>
 # <div class="aspect-video hover:aspect-square"></div>

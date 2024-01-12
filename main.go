@@ -654,6 +654,7 @@ const (
 	_ = iota * 100
 
 	boxSizingOrder
+	displayOrder
 	aspectRatioOrder
 	columnsOrder
 	breakBeforeOrder
@@ -967,7 +968,7 @@ var display = RandomKeywordBaseClass{
 		"hidden": "none",
 	},
 	property: "display",
-	order:    0,
+	order:    displayOrder,
 }
 
 var isolation = RandomKeywordBaseClass{
