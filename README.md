@@ -1,3 +1,16 @@
+In case .md file extension is unfamiliar to you check out this nice overview: https://www.markdownguide.org/getting-started/.
+This will become a readme with documentation, just not yet.
+
+I changed the codebase to be in a single go file.
+This is quite unorthodox so let me try to convince myself why it is a good idea.
+1. It is different and I wanted to try something new.
+2. It is not so bad if you fold everything.
+3. It encourages the total number of functions and structs to remain small as that is the main thing that grows the size of the file after folding.
+4. Less files means less places to look.
+5. Puts more pressure on keeping everything small.
+6. I should not need more than one file considering how simple this tool _should_ be
+
+
 similarities with tailwind
 - all same default base classes
 - almost all same default variants

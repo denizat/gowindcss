@@ -157,7 +157,14 @@ func FuzzParseString(f *testing.F) {
 	})
 }
 
+type NilByteWriter struct{}
+
+func (n NilByteWriter) WriteByte(_ byte) error {
+	return nil
+}
+
 func FuzzFormat(f *testing.F) {
+
 	bs := MakeBaseClasses(nil)
 	var nb = NilByteWriter{}
 	f.Fuzz(func(t *testing.T, s string) {
