@@ -1080,7 +1080,7 @@ type VariantMap map[string]Variant
 
 // https://tailwindcss.com/docs/hover-focus-and-other-states
 type Variant interface {
-	convert(arbitaryValue, slashText string, c CSS) []CSS
+	convert(arbitraryValue, slashText string, c CSS) []CSS
 	base() string
 }
 
@@ -1088,7 +1088,7 @@ func MakeVariants(c *Config) map[string]Variant {
 	return concatMaps(
 		variantMapFromArrs(pseudoClassVariants),
 		variantMapFromArrs(pseudoElementVariants),
-		variantMapFromArrs([]DoublePsuedoElementVariant{markerVariant}),
+		variantMapFromArrs([]DoublePseudoElementVariant{markerVariant}),
 		variantMapFromArrs(genBreakpointsVariant(c)),
 	)
 }
@@ -1107,7 +1107,7 @@ type PseudoClassVariant struct {
 	name string
 }
 
-func (p PseudoClassVariant) convert(arbitaryValue string, slashText string, c CSS) []CSS {
+func (p PseudoClassVariant) convert(arbitraryValue string, slashText string, c CSS) []CSS {
 	c.PseudoClasses = append(c.PseudoClasses, p.name)
 	return []CSS{c}
 }
@@ -1134,7 +1134,7 @@ func PseudoElementNameSameAsValue(n string) PseudoElementVariant {
 	return PseudoElementVariant{name: n, value: n}
 }
 
-func (p PseudoElementVariant) convert(arbitaryValue string, slashText string, c CSS) []CSS {
+func (p PseudoElementVariant) convert(arbitraryValue string, slashText string, c CSS) []CSS {
 	c.PseudoElements = append(c.PseudoClasses, p.name)
 	return []CSS{c}
 }
@@ -1152,19 +1152,19 @@ var pseudoElementVariants = []PseudoElementVariant{
 	PseudoElementNameSameAsValue("backdrop"),
 }
 
-type DoublePsuedoElementVariant struct{ name string }
+type DoublePseudoElementVariant struct{ name string }
 
-func (m DoublePsuedoElementVariant) convert(arbitraryValue string, slashText string, c CSS) []CSS {
+func (m DoublePseudoElementVariant) convert(arbitraryValue string, slashText string, c CSS) []CSS {
 	c.PseudoElements = append(c.PseudoElements, m.name)
 	cc := CSSDeepCopy(c)
 	cc.ChildCombinator = "*"
 	return []CSS{c, cc}
 }
-func (m DoublePsuedoElementVariant) base() string {
+func (m DoublePseudoElementVariant) base() string {
 	return m.name
 }
 
-var markerVariant = DoublePsuedoElementVariant{"marker"}
+var markerVariant = DoublePseudoElementVariant{"marker"}
 
 type MediaVariant struct {
 	name  string
