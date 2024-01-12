@@ -653,6 +653,7 @@ var baseClassesArbitrary = map[string]ArbitraryValueClass{
 const (
 	_ = iota * 100
 
+	floatsOrder
 	boxSizingOrder
 	displayOrder
 	aspectRatioOrder
@@ -894,7 +895,7 @@ var floats = KeywordBaseClass{
 		"right": "right",
 		"none":  "none",
 	},
-	order: 0,
+	order: floatsOrder,
 }
 var clear = KeywordBaseClass{
 	name:     "float",
