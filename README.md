@@ -12,10 +12,6 @@ similarities with tailwind
 - theme() and spacing() functions
 - group and peer support
 
-# Contributing
-If you are interested in contributing just submit a PR and explain what and why you made those changes.
-Try to follow the style of the existing code, however, if your style is better, then explain why and I might switch to it.
-
 # Why gowind instead of tailwind?
 I created gowind because I wanted to use tailwind css in a project but to get autocomplete support in my Jetbrains IDE I had to install tailwind through npm.
 Previously I was using their standalone cli.
@@ -48,9 +44,12 @@ Compared to tailwind, gowind has (or will have):
 - gowind does not support *: or []: (both could be doable but seems like a lot of work that I will put off until someone submits a pr and gives me at least 100$ to do it.)
 - gowind does not have external plugins
 
-# Design Decisions and Developer Notes
-Ignore this section if you will not change the source code.
+# Contributing
+If you are interested in contributing just submit a PR and explain what and why you made those changes.
+Try to follow the style of the existing code, however, if your style is better, then explain why and I might switch to it.
+Please add test cases for whatever you changed though, the syntax is pretty set in stone so we really just want a lot of tests.
 
+# Design Decisions and Developer Notes
 The entire codebase is in two files.
 This is a bit unorthodox so let me try to convince myself why it is a good idea.
 1. It is different and I wanted to try something new.
