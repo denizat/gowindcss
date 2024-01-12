@@ -80,3 +80,9 @@ Also []: because it does a lot of crazy stuff with the string.
 I am just going to have to accept defeat and do an 80/20 solution.
 When you are doing something that complex anyways it would probably be good to just use normal css.
 I could probably support all of tailwind but it would be too crazy.
+
+What is the essence of tailwind?
+- utility classes
+- locality of behavior
+- no need to spend time naming
+- best of both convention and customization

@@ -314,6 +314,10 @@ func OrderedCSSLess(a, b OrderedCSS) int {
 
 func (c CSS) String() string {
 	var b strings.Builder
+	if len(c.GroupSelector) != 0 {
+		b.WriteString(strings.Replace(c.GroupSelector, "/", "\\/", -1))
+		b.WriteByte(' ')
+	}
 	var pc string
 	if len(c.PseudoClasses) >= 1 {
 		pc = ":" + strings.Join(c.PseudoClasses, ":")
@@ -323,6 +327,7 @@ func (c CSS) String() string {
 		pe = "::" + strings.Join(c.PseudoElements, "::")
 	}
 	selector := strings.Replace(c.Selector, "[", "\\[", -1)
+	selector = strings.Replace(selector, "/", "\\/", -1)
 	selector = strings.Replace(selector, "]", "\\]", -1)
 	selector = "." + strings.Replace(selector, ":", "\\:", -1)
 	cc := ""
@@ -565,7 +570,7 @@ func createCSSFromClassInformation(c fullClassInformation, selector string, vs m
 		}
 		l := len(csses)
 		for j := 0; j < l; j++ {
-			res := v.convert(variant.arbitraryText, "", csses[j].CSS)
+			res := v.convert(variant.arbitraryText, variant.slashText, csses[j].CSS)
 			if res == nil {
 				return nil
 			}
@@ -1097,6 +1102,7 @@ func MakeVariants(c *Config) map[string]Variant {
 		variantMapFromArrs(pseudoElementVariants),
 		variantMapFromArrs([]DoublePseudoElementVariant{markerVariant}),
 		variantMapFromArrs(genBreakpointsVariant(c)),
+		variantMapFromArrs(groupVariants),
 	)
 }
 
@@ -1255,6 +1261,27 @@ func (b BreakpointsVariant) base() string {
 }
 
 type groupVariant struct {
+	name  string
+	after string
+}
+
+var groupVariants = []groupVariant{
+	{"group", ""},
+	{"group-hover", ":hover"},
+	{"group-focus", ":focus"},
+}
+
+func (g groupVariant) convert(arbitraryValue, slashText string, c CSS) []CSS {
+	s := ""
+	if slashText != "" {
+		s = "/" + slashText
+	}
+	c.GroupSelector = ".group" + s + g.after
+	return []CSS{c}
+}
+
+func (g groupVariant) base() string {
+	return g.name
 }
 
 //////////////////////////////////////////// UTILS
@@ -1308,6 +1335,9 @@ var defaultFractions = []string{
 
 // https://tailwindcss.com/docs/customizing-colors
 var defaultColors = map[string]string{
+	"black": "rgb(0 0 0)",
+	"white": "rgb(255 255 255)",
+
 	"slate-50":  "#f8fafc",
 	"slate-100": "#f1f5f9",
 	"slate-200": "#e2e8f0",
