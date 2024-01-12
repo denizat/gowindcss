@@ -34,5 +34,9 @@
 <div class="clear-left box-border float-start"></div>
 <div class="float-start clear-left box-border"></div>
 
+<div class="float-start isolate"></div>
+<div class="isolate float-start"></div>
+
+
 # <div class="hover:aspect-square aspect-video"></div>
 # <div class="aspect-video hover:aspect-square"></div>

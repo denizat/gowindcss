@@ -653,6 +653,7 @@ var baseClassesArbitrary = map[string]ArbitraryValueClass{
 const (
 	_ = iota * 100
 
+	isolationOrder
 	floatsOrder
 	clearOrder
 	boxSizingOrder
@@ -979,7 +980,7 @@ var isolation = RandomKeywordBaseClass{
 		"isolation-auto": "auto",
 	},
 	property: "isolation",
-	order:    0,
+	order:    isolationOrder,
 }
 
 type ArbitraryNumericalBaseClass struct {
