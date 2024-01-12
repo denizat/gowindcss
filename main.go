@@ -654,6 +654,7 @@ const (
 	_ = iota * 100
 
 	floatsOrder
+	clearOrder
 	boxSizingOrder
 	displayOrder
 	aspectRatioOrder
@@ -898,8 +899,8 @@ var floats = KeywordBaseClass{
 	order: floatsOrder,
 }
 var clear = KeywordBaseClass{
-	name:     "float",
-	property: "float",
+	name:     "clear",
+	property: "clear",
 	values: map[string]string{
 		"start": "inline-start",
 		"end":   "inline-end",
@@ -908,7 +909,7 @@ var clear = KeywordBaseClass{
 		"both":  "both",
 		"none":  "none",
 	},
-	order: 0,
+	order: clearOrder,
 }
 
 var textWrap = KeywordBaseClass{
