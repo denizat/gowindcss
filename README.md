@@ -1,4 +1,3 @@
-In case .md file extension is unfamiliar to you check out this nice overview: https://www.markdownguide.org/getting-started/.
 # Gowind CSS a *simple* utility-first CSS framework for rapidly building custom user interfaces
 
 # Documentation
