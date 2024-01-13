@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"regexp"
@@ -159,7 +160,11 @@ func FuzzParseString(f *testing.F) {
 
 type NilByteWriter struct{}
 
-func (n NilByteWriter) WriteByte(_ byte) error {
+func (NilByteWriter) Write(p []byte) (n int, err error) {
+	return len(p), nil
+}
+
+func (NilByteWriter) WriteByte(_ byte) error {
 	return nil
 }
 
@@ -171,4 +176,13 @@ func FuzzFormat(f *testing.F) {
 		r := strings.NewReader(s)
 		Format(r, nb, variants, bs)
 	})
+}
+
+func TestHandleFile(t *testing.T) {
+	as := makeArrSet(10)
+	var sb strings.Builder
+	w := bufio.NewWriter(&sb)
+	s := bufio.NewScanner(strings.NewReader("tests/defaultstests.txt\n"))
+	s.Scan()
+	handleFile(s, as, MakeBaseClasses(nil), w)
 }

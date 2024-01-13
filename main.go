@@ -28,18 +28,18 @@ type arrSet struct {
 func makeArrSet(n int) arrSet {
 	return arrSet{
 		set: make(map[string]struct{}, n),
-		arr: make([]OrderedCSS, n),
+		arr: make([]OrderedCSS, 0, n),
 	}
 }
 
-func (a arrSet) exists(s []byte) bool {
+func (a *arrSet) exists(s []byte) bool {
 	_, ok := a.set[string(s)]
 	return ok
 }
 
 // can add multiple csses with only one matching string
 // useful for the marker: variant and other variants that create multiple CSSes
-func (a arrSet) add(s string, v []OrderedCSS) {
+func (a *arrSet) add(s string, v []OrderedCSS) {
 	a.set[s] = struct{}{}
 	a.arr = append(a.arr, v...)
 }
@@ -155,17 +155,28 @@ func main() {
 	writer := bufio.NewWriter(os.Stdout)
 	as := makeArrSet(20)
 	for scanner.Scan() {
-		fileName := scanner.Text()
-		file, err := os.Open(fileName)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%e\n", err)
-		}
-		reader := bufio.NewReader(file)
-		FillCacheFromStream(*reader, as, variants, bs)
-		s := OrderedCSSArrToString(as.arr)
-		writer.WriteString(s)
-		writer.Flush()
+		handleFile(scanner, as, bs, writer)
 	}
+}
+
+func handleFile(scanner *bufio.Scanner, as arrSet, bs map[string]OrderedCSS, writer *bufio.Writer) {
+	fileName := scanner.Text()
+	file, err := os.Open(fileName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%#v\n", err)
+	}
+	reader := bufio.NewReader(file)
+	FillCacheFromStream(*reader, &as, variants, bs)
+	s := OrderedCSSArrToString(as.arr)
+	_, err = writer.WriteString(s)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%#v\n", err)
+	}
+	err = writer.Flush()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%#v\n", err)
+	}
+
 }
 
 func HandleConfigFile(fileName *string) map[string]OrderedCSS {
@@ -192,6 +203,8 @@ func HandleConfigFile(fileName *string) map[string]OrderedCSS {
 	}
 	return MakeBaseClasses(&config)
 }
+
+//////////////////////////////////////////// FORMAT
 
 func Format(r io.ByteReader, w io.ByteWriter, vs map[string]Variant, bs map[string]OrderedCSS) {
 	for {
@@ -408,7 +421,7 @@ func Break(b byte) bool {
 	return b == ' ' || b == '\t' || b == '\n' || b == '"' || b == '`'
 }
 
-func FillCacheFromStream(r bufio.Reader, as arrSet, vs map[string]Variant, bs map[string]OrderedCSS) {
+func FillCacheFromStream(r bufio.Reader, as *arrSet, vs map[string]Variant, bs map[string]OrderedCSS) {
 	scanner := bufio.NewScanner(&r)
 	// copied from bufio.ScanWords
 	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
