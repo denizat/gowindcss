@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"embed"
 	"encoding/json"
 	"flag"
@@ -17,6 +18,31 @@ import (
 
 //go:embed main.go main_test.go go.mod go.sum tests/* README.md LICENSE
 var sourceCode embed.FS
+
+// could make this generic
+type arrSet struct {
+	set map[string]struct{}
+	arr []OrderedCSS
+}
+
+func makeArrSet(n int) arrSet {
+	return arrSet{
+		set: make(map[string]struct{}, n),
+		arr: make([]OrderedCSS, n),
+	}
+}
+
+func (a arrSet) exists(s []byte) bool {
+	_, ok := a.set[string(s)]
+	return ok
+}
+
+// can add multiple csses with only one matching string
+// useful for the marker: variant and other variants that create multiple CSSes
+func (a arrSet) add(s string, v []OrderedCSS) {
+	a.set[s] = struct{}{}
+	a.arr = append(a.arr, v...)
+}
 
 // TODO: remove as many panics as I can and do real error handling
 func main() {
@@ -127,23 +153,31 @@ func main() {
 	// do the rest
 	scanner := bufio.NewScanner(os.Stdin)
 	writer := bufio.NewWriter(os.Stdout)
+	as := makeArrSet(20)
 	for scanner.Scan() {
-		csses := ParseString(scanner.Text(), variants, bs)
-		s := OrderedCSSArrToString(csses)
-		_, err := writer.WriteString(s)
+		fileName := scanner.Text()
+		file, err := os.Open(fileName)
 		if err != nil {
-			fmt.Fprint(os.Stderr, err)
+			fmt.Fprintf(os.Stderr, "%e\n", err)
 		}
-		err = writer.Flush()
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-		}
+		reader := bufio.NewReader(file)
+		FillCacheFromStream(*reader, as, variants, bs)
+		s := OrderedCSSArrToString(as.arr)
+		writer.WriteString(s)
+		writer.Flush()
 	}
 }
 
-func ParseConfigFile(file []byte) map[string]OrderedCSS {
+func HandleConfigFile(fileName *string) map[string]OrderedCSS {
+	if fileName == nil {
+		return MakeBaseClasses(nil)
+	}
+	bs, err := os.ReadFile(*fileName)
+	if err != nil {
+		panic(err)
+	}
 	var config Config
-	json.Unmarshal(file, &config)
+	json.Unmarshal(bs, &config)
 	if config.Theme.Colors != nil {
 		defaultColors = config.Theme.Colors
 	}
@@ -157,18 +191,6 @@ func ParseConfigFile(file []byte) map[string]OrderedCSS {
 		maps.Copy(defaultColors, config.Theme.Extend.Screens)
 	}
 	return MakeBaseClasses(&config)
-
-}
-
-func HandleConfigFile(fileName *string) map[string]OrderedCSS {
-	if fileName == nil {
-		return MakeBaseClasses(nil)
-	}
-	bs, err := os.ReadFile(*fileName)
-	if err != nil {
-		panic(err)
-	}
-	return ParseConfigFile(bs)
 }
 
 func Format(r io.ByteReader, w io.ByteWriter, vs map[string]Variant, bs map[string]OrderedCSS) {
@@ -382,53 +404,59 @@ type fullClassInformation struct {
 	class    parsedValue
 }
 
-func parse(s string) *fullClassInformation {
-	return parsestr(s)
+func Break(b byte) bool {
+	return b == ' ' || b == '\t' || b == '\n' || b == '"' || b == '`'
 }
 
-func ParseString(s string, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
-	r := strings.NewReader(s)
-	csses := []OrderedCSS{}
-	for {
-		res := ProduceNextCSS(r, vs, bs)
-		if res == nil {
-			return csses
+func FillCacheFromStream(r bufio.Reader, as arrSet, vs map[string]Variant, bs map[string]OrderedCSS) {
+	scanner := bufio.NewScanner(&r)
+	// copied from bufio.ScanWords
+	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		start := 0
+		for ; start < len(data); start++ {
+			if !(Break(data[start])) {
+				break
+			}
 		}
-		csses = append(csses, res...)
-	}
-}
+		for i := start; i < len(data); i++ {
+			if Break(data[i]) {
+				return i, data[start:i], nil
+			}
+		}
+		// If we're at EOF, we have a final, non-empty, non-terminated word. Return it.
+		if atEOF && len(data) > start {
+			return len(data), data[start:], nil
+		}
+		// Request more data.
+		return start, nil, nil
+	})
+	for scanner.Scan() {
+		s := scanner.Bytes()
+		if as.exists(s) {
+			continue
+		}
 
-func ProduceNextCSS(r io.ByteReader, vs map[string]Variant, bs map[string]OrderedCSS) []OrderedCSS {
-	for {
-		s := grabFirstPossibleValidString(r)
-		if len(s) == 0 {
-			return nil
-		}
 		res := parsestr(s)
 		if res == nil {
 			continue
 		}
-		csses := createCSSFromClassInformation(*res, s, vs, bs)
+		csses := createCSSFromClassInformation(*res, string(s), vs, bs)
 		if csses != nil {
-			return csses
+			as.add(string(s), csses)
 		}
-	}
-
-}
-
-func grabFirstPossibleValidString(r io.ByteReader) string {
-	var sb strings.Builder
-	for {
-		b, err := r.ReadByte()
-		if err != nil || b == ' ' || b == '\n' || b == '\t' || b == '"' || b == '`' {
-			return sb.String()
-		}
-		sb.WriteByte(b)
 	}
 }
 
-func parsestr(s string) *fullClassInformation {
-	r := strings.NewReader(s)
+func ParseString(s string, vs VariantMap, bs BaseClassMap) []OrderedCSS {
+	res := parsestr([]byte(s))
+	if res == nil {
+		return nil
+	}
+	return createCSSFromClassInformation(*res, s, vs, bs)
+}
+
+func parsestr(s []byte) *fullClassInformation {
+	r := bytes.NewReader(s)
 	var res fullClassInformation
 	for {
 		pv, variant := parseNextPart(r)

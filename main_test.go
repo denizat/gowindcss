@@ -83,17 +83,17 @@ func TestParse(t *testing.T) {
 
 	s = "abc"
 	ex = fullClassInformation{class: parsedValue{name: "abc", arbitraryText: ""}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "abc-abc"
 	ex = fullClassInformation{class: parsedValue{name: "abc-abc", arbitraryText: ""}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "abc-abc-[100]"
 	ex = fullClassInformation{class: parsedValue{name: "abc-abc", arbitraryText: "100"}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "a:b"
@@ -102,7 +102,7 @@ func TestParse(t *testing.T) {
 			{name: "a", arbitraryText: ""},
 		},
 		class: parsedValue{name: "b", arbitraryText: ""}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "a-[100]:b-[200]"
@@ -111,7 +111,7 @@ func TestParse(t *testing.T) {
 			{name: "a", arbitraryText: "100"},
 		},
 		class: parsedValue{name: "b", arbitraryText: "200"}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "[100]:[200]:[300]"
@@ -121,13 +121,13 @@ func TestParse(t *testing.T) {
 			{name: "", arbitraryText: "200"},
 		},
 		class: parsedValue{name: "", arbitraryText: "300"}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "a/b"
 	ex = fullClassInformation{
 		class: parsedValue{name: "a", slashText: "b"}}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "a-[zz]/b:c"
@@ -135,7 +135,7 @@ func TestParse(t *testing.T) {
 		variants: []parsedValue{{name: "a", arbitraryText: "zz", slashText: "b"}},
 		class:    parsedValue{name: "c"},
 	}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 	s = "a-[zz]/b-[car]:c/d"
@@ -143,7 +143,7 @@ func TestParse(t *testing.T) {
 		variants: []parsedValue{{name: "a", arbitraryText: "zz", slashText: "b-[car]"}},
 		class:    parsedValue{name: "c", slashText: "d"},
 	}
-	act = *parse(s)
+	act = *parsestr([]byte(s))
 	assert.Equal(ex, act)
 
 }
