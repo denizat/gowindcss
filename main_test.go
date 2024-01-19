@@ -1,12 +1,13 @@
 package main
 
 import (
-	"bufio"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 )
 
 var commentLineRegex = regexp.MustCompile("#.*\n")
@@ -71,7 +72,7 @@ func TestFormat(t *testing.T) {
 		r := strings.NewReader(acase.from)
 		var sb strings.Builder
 
-		Format(r, &sb, variants, MakeBaseClasses(nil))
+		formatWrapper(r, &sb, variants, MakeBaseClasses(nil))
 		assert.Equal(acase.to, sb.String())
 	}
 }
@@ -174,15 +175,15 @@ func FuzzFormat(f *testing.F) {
 	var nb = NilByteWriter{}
 	f.Fuzz(func(t *testing.T, s string) {
 		r := strings.NewReader(s)
-		Format(r, nb, variants, bs)
+		formatWrapper(r, nb, variants, bs)
 	})
 }
 
-func TestHandleFile(t *testing.T) {
-	as := makeArrSet(10)
-	var sb strings.Builder
-	w := bufio.NewWriter(&sb)
-	s := bufio.NewScanner(strings.NewReader("tests/defaultstests.txt\n"))
-	s.Scan()
-	handleFile(s, as, MakeBaseClasses(nil), w)
+func TestDebounce(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		debounced(1*time.Second, func() {
+			fmt.Println(time.Now())
+		})
+	}
+	time.Sleep(2 * time.Second)
 }

@@ -13,7 +13,9 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"text/tabwriter"
+	"time"
 )
 
 //go:embed main.go main_test.go go.mod go.sum tests/* README.md LICENSE
@@ -146,37 +148,66 @@ func main() {
 		}
 		reader := bufio.NewReader(inFile)
 		writer := bufio.NewWriter(outFile)
-		Format(reader, writer, variants, bs)
+		formatWrapper(reader, writer, variants, bs)
 		os.Exit(0)
 	}
 
 	// do the rest
 	scanner := bufio.NewScanner(os.Stdin)
 	writer := bufio.NewWriter(os.Stdout)
+	_ = writer
 	as := makeArrSet(20)
+	done := false
+	donemux := sync.Mutex{}
+	d := debounced(15*time.Millisecond, func() {
+		//WriteOrderedCSSArr(as.arr, writer)
+		//writer.Flush()
+		fmt.Println("write")
+		donemux.Lock()
+		done = true
+		donemux.Unlock()
+	})
+	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {
-		handleFile(scanner, as, bs, writer)
+		// open buffered file reader
+		fileName := scanner.Text()
+		file, _ := os.Open(fileName)
+		r := bufio.NewReader(file)
+		// fill the cache
+		FillCacheFromStream(r, &as, variants, bs)
+		fmt.Printf("cache size %d\n", len(as.arr))
+		// write the cache when the time is ready
+		donemux.Lock()
+		done = false
+		donemux.Unlock()
+		d()
+	}
+	for {
+		donemux.Lock()
+		if done {
+			break
+		}
+		donemux.Unlock()
+		time.Sleep(1 * time.Millisecond)
 	}
 }
 
-func handleFile(scanner *bufio.Scanner, as arrSet, bs map[string]OrderedCSS, writer *bufio.Writer) {
-	fileName := scanner.Text()
-	file, err := os.Open(fileName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%#v\n", err)
+// https://gist.github.com/leolara/d62b87797b0ef5e418cd?permalink_comment_id=2243168#gistcomment-2243168
+func debounced(interval time.Duration, f func()) func() {
+	var timer *time.Timer
+	return func() {
+		if timer == nil {
+			timer = time.NewTimer(interval)
+			go func() {
+				<-timer.C
+				timer.Stop()
+				timer = nil
+				f()
+			}()
+		} else {
+			timer.Reset(interval)
+		}
 	}
-	reader := bufio.NewReader(file)
-	FillCacheFromStream(*reader, &as, variants, bs)
-	s := OrderedCSSArrToString(as.arr)
-	_, err = writer.WriteString(s)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%#v\n", err)
-	}
-	err = writer.Flush()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%#v\n", err)
-	}
-
 }
 
 func HandleConfigFile(fileName *string) map[string]OrderedCSS {
@@ -206,14 +237,14 @@ func HandleConfigFile(fileName *string) map[string]OrderedCSS {
 
 //////////////////////////////////////////// FORMAT
 
-func Format(r io.ByteReader, w io.ByteWriter, vs map[string]Variant, bs map[string]OrderedCSS) {
+func formatWrapper(r io.ByteReader, w io.ByteWriter, vs map[string]Variant, bs map[string]OrderedCSS) {
 	for {
 		streamUntilMatch(r, w, "class=\"")
 		s, err := collectUntil(r, '"')
 		if err != nil {
 			break
 		}
-		s = realFormatGiveBetterName(s, vs, bs) + "\""
+		s = format(s, vs, bs) + "\""
 		for i := range s {
 			w.WriteByte(s[i])
 		}
@@ -256,7 +287,7 @@ func streamUntilMatch(r io.ByteReader, w io.ByteWriter, s string) {
 	}
 }
 
-func realFormatGiveBetterName(s string, vs map[string]Variant, bs map[string]OrderedCSS) string {
+func format(s string, vs map[string]Variant, bs map[string]OrderedCSS) string {
 	classNames := strings.Split(s, " ")
 	slices.SortFunc(classNames, func(a, b string) int {
 		ac := ParseString(a, vs, bs)[0]
@@ -398,11 +429,20 @@ func wrapInMedias(ms []string, s string) string {
 	return out
 }
 func OrderedCSSArrToString(c []OrderedCSS) string {
-	var b strings.Builder
+	return string(OrderedCSSArrToBytes(c))
+}
+func OrderedCSSArrToBytes(c []OrderedCSS) []byte {
+	b := bytes.NewBuffer(make([]byte, 0))
 	for _, css := range c {
 		b.WriteString(css.String())
 	}
-	return b.String()
+	return b.Bytes()
+}
+
+func WriteOrderedCSSArr(c []OrderedCSS, w *bufio.Writer) {
+	for _, css := range c {
+		w.WriteString(css.String())
+	}
 }
 
 //////////////////////////////////////////// ENGINE
@@ -421,8 +461,8 @@ func Break(b byte) bool {
 	return b == ' ' || b == '\t' || b == '\n' || b == '"' || b == '`'
 }
 
-func FillCacheFromStream(r bufio.Reader, as *arrSet, vs map[string]Variant, bs map[string]OrderedCSS) {
-	scanner := bufio.NewScanner(&r)
+func FillCacheFromStream(r *bufio.Reader, as *arrSet, vs map[string]Variant, bs map[string]OrderedCSS) {
+	scanner := bufio.NewScanner(r)
 	// copied from bufio.ScanWords
 	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		start := 0
